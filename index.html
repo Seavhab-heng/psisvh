@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- FAVICON IMPLEMENTATION: New Icon URLs from psisvh.vercel.app -->
+    <link rel="apple-touch-icon" sizes="180x180" href="https://psisvh.vercel.app/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://psisvh.vercel.app/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://psisvh.vercel.app/favicon-16x16.png">
+    <link rel="shortcut icon" href="https://psisvh.vercel.app/favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://psisvh.vercel.app/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://psisvh.vercel.app/android-chrome-512x512.png">
+    
     <title>Paññāsāstra International School - Van Hong (PSIS VH)</title>
-    <!-- Favicon Update: Using an embedded SVG data URI for modern, single-file favicon support (Yellow Star) -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23FBBF24' d='M50 0L65.45 34.54L100 38.82L75 64.18L81.8 100L50 81.8L18.2 100L25 64.18L0 38.82L34.55 34.54Z'/%3E%3C/svg%3E">
-    
-    <!-- Favicon Links (Referencing files the user must place in the root directory) -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="shortcut icon" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
-    
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Configure Tailwind to use Inter font and custom colors -->
@@ -57,40 +55,6 @@
         .svg-bg {
             background: linear-gradient(135deg, #FFD700 0%, #FFA07A 100%);
         }
-
-        /* Chatbot specific styles */
-        #chat-window {
-            height: 80vh;
-            max-height: 500px;
-            width: 100%;
-            max-width: 350px;
-            right: 1rem;
-            bottom: 6rem; /* Space for the FAB and padding */
-            z-index: 90;
-            transition: all 0.3s ease-in-out;
-            transform: translateY(100%);
-            opacity: 0;
-            pointer-events: none;
-        }
-        #chat-window.open {
-            transform: translateY(0);
-            opacity: 1;
-            pointer-events: auto;
-        }
-        @media (max-width: 640px) {
-            #chat-window {
-                height: 90vh;
-                max-height: none;
-                width: 90%;
-                right: 5%;
-                bottom: 5rem;
-            }
-        }
-        #chat-messages {
-            height: calc(100% - 70px); /* Subtract input height */
-            overflow-y: auto;
-            scroll-behavior: smooth;
-        }
     </style>
 </head>
 <body class="font-sans bg-bg-light text-gray-800">
@@ -104,40 +68,35 @@
                 <button onclick="closeModal()" class="text-gray-500 hover:text-red-500 transition-colors text-3xl leading-none focus:outline-none">&times;</button>
             </div>
             <p class="text-gray-700 mb-6 text-center">Please choose the chat line you wish to contact:</p>
-
+            
             <div class="space-y-4">
                 <!-- Telegram Button 1 -->
                 <a href="https://t.me/+85516832588" target="_blank" class="block w-full text-center bg-accent-yellow text-primary-blue py-3 px-6 text-lg font-semibold rounded-lg hover:bg-yellow-300 transition duration-300 shadow-md transform hover:scale-[1.02]">
                     <span class="text-xl mr-2">&#9992;</span> Telegram Chat (Line 1)
                 </a>
                 <!-- Telegram Button 2 -->
-                <a href="https://t.me/+85593815888" target="_blank" class="block w-full text-center bg-accent-yellow text-primary-blue py-3 px-6 text-lg font-semibold rounded-lg hover:bg-yellow-300 transition duration-300 shadow-md transform hover:scale-[1.02]">
+                <a href="https://t.me/+85593815888" target="_blank" class="block w-full text-center bg-accent-yellow text-primary-blue py-3 px-6 text-lg font-semibold rounded-lg hover:bg-yellow-300 transition duration-300 transform hover:scale-[1.02]">
                     <span class="text-xl mr-2">&#9992;</span> Telegram Chat (Line 2)
                 </a>
                 <!-- Telegram Button 3 -->
-                <a href="https://t.me/+85589663888" target="_blank" class="block w-full text-center bg-accent-yellow text-primary-blue py-3 px-6 text-lg font-semibold rounded-lg hover:bg-yellow-300 transition duration-300 shadow-md transform hover:scale-[1.02]">
-                    <span class="text-xl mr-2">&#9992;</span> Telegram Chat (Line 3)
-                    <span class="text-xl mr-2">&#9992;</span> Chat on Telegram (Line 3)
+                <a href="https://t.me/+85589663888" target="_blank" class="block w-full text-center bg-accent-yellow text-primary-blue py-3 px-6 text-lg font-semibold rounded-lg hover:bg-yellow-300 transition duration-300 transform hover:scale-[1.02]">
+                    <span class="text-xl mr-2">&#9992;</span> Chat (Line 3)
                 </a>
             </div>
-
+            
             <div class="mt-6 text-center">
                 <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-sm mt-4 focus:outline-none">Close Window</button>
             </div>
         </div>
     </div>
-
+    
     <!-- Navigation Header (Using PSIS VH) -->
     <header class="sticky top-0 z-50 bg-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-2">
-                <!-- School Logo/Icon -->
-                <div class="text-3xl font-extrabold text-accent-yellow transition duration-300 hover:text-primary-blue">
-                    &#10031;
-                <div class="text-3xl font-extrabold text-accent-yellow transition duration-300 hover:text-primary-blue flex items-center justify-center">
-                    <!-- Image tag pointing to /logo.png with emoji fallback -->
-                    <img src="/logo.png" alt="PSIS VH Logo" class="h-8 w-auto object-contain" 
-                         onerror="this.outerHTML='&#10031;'" style="max-height: 2rem;"> 
+                <!-- School Logo/Icon - Changed from Apple to Book -->
+                <div class="text-3xl font-extrabold text-red-600 transition duration-300 hover:text-primary-blue">
+                    &#128218; 
                 </div>
                 <h1 class="text-xl font-bold text-gray-800 hidden sm:block">PSIS VH</h1>
             </div>
@@ -145,12 +104,14 @@
             <nav class="flex space-x-4 text-sm font-medium">
                 <a href="#about" class="text-gray-600 hover:text-primary-blue transition duration-150 p-2 rounded-lg">About</a>
                 <a href="#programs" class="text-gray-600 hover:text-primary-blue transition duration-150 p-2 rounded-lg">Programs</a>
+                <!-- Added link for the new tool section -->
+                <a href="#admin-tool" class="text-gray-600 hover:text-primary-blue transition duration-150 p-2 rounded-lg hidden sm:block">Admin Tool</a> 
                 <a href="#contact" class="hidden sm:inline-block bg-primary-blue text-white py-2 px-4 rounded-full hover:bg-indigo-700 transition duration-150 shadow-md">Enroll Now</a>
             </nav>
         </div>
     </header>
 
-    <!-- Hero Section (Updated with attractive SVG overlay) -->
+    <!-- Hero Section -->
     <section id="hero" class="bg-primary-blue py-12 sm:py-20 lg:py-28 text-white relative overflow-hidden">
         <!-- Cheerful Background Shapes (Visual flair) -->
         <div class="absolute inset-0 z-0 opacity-10">
@@ -192,8 +153,7 @@
                             <!-- Arms Waving -->
                             <path d="M30 65 Q15 75, 20 85" stroke="#FFEAA7" stroke-width="6" stroke-linecap="round"/>
                             <path d="M70 65 Q85 75, 80 85" stroke="#FFEAA7" stroke-width="6" stroke-linecap="round"/>
-                            <!-- Star decoration -->
-                            <path d="M50 20 L53 27 L60 28 L55 33 L56 40 L50 36 L44 40 L45 33 L40 28 L47 27 Z" fill="#FBBF24"/>
+                            <!-- Note: Removed the Apple decoration here -->
                         </svg>
                     </div>
                 </div>
@@ -201,7 +161,7 @@
         </div>
     </section>
 
-    <!-- About Us Section (Updated Curriculum & Registration) -->
+    <!-- About Us Section -->
     <section id="about" class="py-16 sm:py-24 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
@@ -210,8 +170,8 @@
                     We believe in holistic development, fostering curiosity, creativity, and confidence in all our students.
                 </p>
             </div>
-
-            <!-- School Range & Curriculum Information (Updated) -->
+            
+            <!-- School Range & Curriculum Information -->
             <div class="mt-10 p-6 sm:p-8 bg-primary-blue/10 rounded-xl border-l-4 border-primary-blue text-center max-w-3xl mx-auto">
                 <h3 class="text-2xl font-bold text-primary-blue mb-3">Comprehensive Education, Nursery to Grade 12</h3>
                 <p class="text-gray-700 font-extrabold text-lg">
@@ -224,11 +184,11 @@
                     Our programs span from **Nursery to Kindergarten (K)** and continue through **Grade 1 to Grade 12**, with full-time and part-time options available.
                 </p>
             </div>
-
+            
             <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Feature 1 -->
+                <!-- Feature 1 - Icon changed to Book -->
                 <div class="p-6 bg-bg-light rounded-2xl card-shadow text-center">
-                    <div class="text-4xl text-safe-green mb-4">&#127775;</div>
+                    <div class="text-4xl text-safe-green mb-4">&#128218;</div>
                     <h3 class="text-xl font-bold text-gray-900">Play-Based Learning</h3>
                     <p class="mt-2 text-gray-600">
                         Children explore concepts through hands-on activities and imaginative play, making education enjoyable.
@@ -302,8 +262,56 @@
         </div>
     </section>
 
+    <!-- NEW: Gemini-Powered Announcement Draft Tool Section -->
+    <section id="admin-tool" class="py-16 sm:py-24 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">
+                    <span class="text-primary-blue">School Announcement Draft Tool</span> ✨
+                </h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+                    Use the power of AI to instantly generate professional, friendly announcements for parents and staff.
+                </p>
+            </div>
+
+            <div class="mt-10 p-8 bg-bg-light rounded-2xl card-shadow border-t-4 border-primary-blue">
+                <div class="space-y-6">
+                    <!-- Input 1: Topic/Key Points -->
+                    <div>
+                        <label for="announcement-topic" class="block text-lg font-medium text-gray-700 mb-2">1. Key Points/Topic:</label>
+                        <textarea id="announcement-topic" rows="4" placeholder="e.g., School closure tomorrow due to bad weather. All classes moved online. Teachers will email instructions by 8am." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary-blue focus:border-primary-blue transition-shadow shadow-inner"></textarea>
+                    </div>
+
+                    <!-- Input 2: Tone/Audience -->
+                    <div>
+                        <label for="announcement-tone" class="block text-lg font-medium text-gray-700 mb-2">2. Desired Audience & Tone:</label>
+                        <select id="announcement-tone" class="w-full p-3 border border-gray-300 rounded-lg bg-white shadow-inner focus:ring-primary-blue focus:border-primary-blue transition">
+                            <option value="Warm and Formal (Parents)">Warm and Formal (Parents - Official Email)</option>
+                            <option value="Enthusiastic and Cheerful (Students)">Enthusiastic and Cheerful (Students - Assembly)</option>
+                            <option value="Concise and Professional (Staff)">Concise and Professional (Staff - Memo)</option>
+                            <option value="Urgent and Clear (Emergency)">Urgent and Clear (Emergency - SMS Alert)</option>
+                        </select>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button id="generate-announcement-btn" class="w-full bg-safe-green text-white py-3 px-6 text-lg font-semibold rounded-full hover:bg-emerald-600 transition duration-300 transform hover:scale-[1.01] shadow-xl">
+                        Draft Announcement ✨
+                    </button>
+                </div>
+                
+                <!-- Output Area -->
+                <div id="announcement-output" class="mt-8">
+                    <div class="p-4 text-center text-gray-500 bg-gray-50 rounded-xl border border-gray-200">
+                        Your generated announcement draft will appear here.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
     <!-- Testimonials Section -->
-    <section class="py-16 sm:py-24 bg-white">
+    <section class="py-16 sm:py-24 bg-primary-blue bg-opacity-5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
                 <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">What Parents Are Saying</h2>
@@ -342,7 +350,7 @@
                 <a href="tel:093815888" class="w-full sm:w-auto flex-grow sm:flex-grow-0 flex items-center justify-center bg-safe-green text-white py-3 px-6 text-lg font-semibold rounded-full hover:bg-emerald-600 transition duration-300 transform hover:scale-105 shadow-xl">
                     Call Us: 093 815 888
                 </a>
-
+                
                 <!-- SINGLE TELEGRAM BUTTON (Triggers Modal) -->
                 <button onclick="openModal()" class="w-full sm:w-auto flex-grow sm:flex-grow-0 flex items-center justify-center bg-accent-yellow text-primary-blue py-3 px-6 text-lg font-semibold rounded-full hover:bg-yellow-300 transition duration-300 transform hover:scale-105 shadow-xl">
                     <span class="text-xl mr-2">&#9992;</span> Chat on Telegram
@@ -363,7 +371,7 @@
                     referrerpolicy="no-referrer-when-downgrade">
                 </iframe>
             </div>
-
+            
             <!-- Directions Button -->
             <a href="https://maps.app.goo.gl/ZPzMsm9VEwvoVb8V8" target="_blank" class="mt-6 inline-block bg-safe-green text-white py-3 px-8 text-lg font-semibold rounded-full hover:bg-emerald-600 transition duration-300 transform hover:scale-105 shadow-xl">
                 <span class="text-xl mr-2">&#128205;</span> Get Directions on Google Maps
@@ -378,42 +386,13 @@
         </div>
     </section>
 
-    <!-- --- CHATBOT WIDGET START --- -->
-
-    <!-- Chat Window (Floating, fixed position) -->
-    <div id="chat-window" class="fixed rounded-lg shadow-2xl bg-white flex flex-col hidden">
-        <div class="p-4 bg-primary-blue text-white rounded-t-lg flex justify-between items-center">
-            <span class="font-bold text-lg">PSIS VH Admissions Advisor</span>
-            <button onclick="toggleChat()" class="text-xl font-bold leading-none">&times;</button>
-        </div>
-        <div id="chat-messages" class="flex-grow p-4 space-y-4">
-            <!-- Initial welcome message -->
-            <div class="flex justify-start">
-                <div class="bg-gray-200 text-gray-800 p-3 rounded-xl rounded-tl-none max-w-[80%] shadow-sm">
-                    Hello! I'm your Admissions Advisor for Paññāsāstra International School - Van Hong. How can I help you and your child today?
-                </div>
-            </div>
-        </div>
-        <div class="p-3 border-t">
-            <div class="relative">
-                <input type="text" id="chat-input" placeholder="Ask about programs, curriculum, or enrollment..." 
-                       class="w-full py-2 pl-3 pr-10 border border-gray-300 rounded-full focus:ring-primary-blue focus:border-primary-blue"
-                       onkeydown="if(event.key === 'Enter') sendMessage()">
-                <button onclick="sendMessage()" id="send-btn" class="absolute right-0 top-0 mt-2 mr-3 text-primary-blue hover:text-indigo-700 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-                        <path d="M3.478 2.405a.75.75 0 0 0-.926.94l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.599 60.599 0 0 0 18.442-8.685.75.75 0 0 0 0-1.218A60.599 60.599 0 0 0 3.478 2.405Z" />
-                    </svg>
-                </button>
-            </div>
-        </div>
+    <!-- --- FACEBOOK MESSENGER CUSTOMER CHAT PLUGIN START --- -->
+    <div class="fb-customerchat"
+      page_id="PannasastraInternationalSchoolVANHONG.psisvh"
+      greeting_dialog_display="fade"
+      logged_in_greeting="Welcome back! How can we help your child today?"
+      logged_out_greeting="Hi there! Ask us about programs, enrollment, or tours.">
     </div>
-
-    <!-- Floating Chat Button (FAB) -->
-    <button onclick="toggleChat()" class="fixed right-4 bottom-4 w-14 h-14 bg-accent-yellow text-primary-blue rounded-full shadow-2xl flex items-center justify-center text-3xl hover:bg-yellow-300 transition duration-300 z-50 transform hover:scale-110">
-        &#9993;
-    </button>
-
-    <!-- --- CHATBOT WIDGET END --- -->
 
     <!-- Footer (Updated Name) -->
     <footer class="bg-gray-800 text-white py-6">
@@ -427,203 +406,170 @@
         </div>
     </footer>
 
-    <!-- Auto-Scroll, Modal, and Chatbot Script -->
-    <script>
-        let chatHistory = [];
-        const SYSTEM_PROMPT = `You are an Admissions Advisor for Paññāsāstra International School - Van Hong (PSIS VH). Your goal is to be friendly, encouraging, and provide accurate, concise information to prospective parents.
+    <!-- Scripts (Facebook SDK, Modal, LLM Logic, and Firebase Setup) -->
+    <script type="module">
+        // --- Firebase/LLM Setup (REQUIRED FOR API CALLS) ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // Firestore is not used, so only Auth/App imports are needed
 
-Core Facts to Use:
-1.  **Full Name:** Paññāsāstra International School - Van Hong. (Short name: PSIS VH).
-2.  **Motto/Atmosphere:** "Learn with joy! A good atmosphere provides warmth! A place for children to grow with joy!"
-3.  **Curriculum:** Offers a 3-language curriculum: Khmer, English, and Chinese.
-4.  **Programs:** Nursery up to Grade 12.
-5.  **Registration:** Accepting registration every day.
+        // Global variables provided by the environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-Always encourage parents to use the contact information on the page (e.g., call 093 815 888 or use Telegram) for tours or enrollment. Keep responses professional, warm, and brief.`;
+        let auth; 
+        const GEMINI_MODEL = "gemini-2.5-flash-preview-09-2025";
+        const API_KEY = ""; // Use empty string for automatic handling
 
-        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=";
-        const apiKey = ""; // API key will be provided by the environment
+        // Exponential Backoff function for API robustness
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-        // --- Utility Functions ---
-
-        /** Toggles the chat window visibility. */
-        function toggleChat() {
-            const chatWindow = document.getElementById('chat-window');
-            chatWindow.classList.toggle('open');
-            chatWindow.classList.toggle('hidden');
-        }
-
-        /** Clears the input and scrolls messages to the bottom. */
-        function finishMessage(input, messagesDiv) {
-            input.value = '';
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            document.getElementById('send-btn').disabled = false;
-        }
-
-        /** Creates and appends a message bubble to the chat window. */
-        function appendMessage(text, role) {
-            const messagesDiv = document.getElementById('chat-messages');
-            const messageWrapper = document.createElement('div');
-            const messageBubble = document.createElement('div');
-
-            // Apply role-specific styling
-            if (role === 'user') {
-                messageWrapper.className = 'flex justify-end';
-                messageBubble.className = 'bg-primary-blue text-white p-3 rounded-xl rounded-br-none max-w-[80%] shadow-md';
-            } else {
-                messageWrapper.className = 'flex justify-start';
-                messageBubble.className = 'bg-gray-200 text-gray-800 p-3 rounded-xl rounded-tl-none max-w-[80%] shadow-sm';
-            }
-
-            // Convert text to Markdown for display (supports bold, lists)
-            messageBubble.innerHTML = formatMarkdown(text); 
-
-            messageWrapper.appendChild(messageBubble);
-            messagesDiv.appendChild(messageWrapper);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        /** Simple Markdown to HTML conversion for display. */
-        function formatMarkdown(text) {
-            // Bold
-            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            // Basic line breaks
-            text = text.replace(/\n/g, '<br>');
-            return text;
-        }
-
-        /** Adds a typing indicator for the bot. */
-        function addTypingIndicator() {
-            const messagesDiv = document.getElementById('chat-messages');
-            const indicator = document.createElement('div');
-            indicator.id = 'typing-indicator';
-            indicator.className = 'flex justify-start';
-            indicator.innerHTML = `
-                <div class="bg-gray-200 text-gray-800 p-3 rounded-xl rounded-tl-none max-w-[80%] shadow-sm flex items-center space-x-2">
-                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                </div>
-            `;
-            messagesDiv.appendChild(indicator);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        /** Removes the typing indicator. */
-        function removeTypingIndicator() {
-            const indicator = document.getElementById('typing-indicator');
-            if (indicator) {
-                indicator.remove();
+        async function fetchWithRetry(url, options, retries = 3) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        if (response.status === 429 || response.status >= 500) {
+                            throw new Error(`Server error: ${response.status}`);
+                        }
+                        throw new Error(`Client error: ${response.status}`);
+                    }
+                    return response;
+                } catch (error) {
+                    if (i < retries - 1) {
+                        const waitTime = Math.pow(2, i) * 1000;
+                        await delay(waitTime);
+                    } else {
+                        throw error;
+                    }
+                }
             }
         }
 
-        // --- Core Chat Functions ---
+        // Function to call Gemini API for announcement generation
+        async function generateAnnouncement(topic, tone) {
+            const generateButton = document.getElementById('generate-announcement-btn');
+            const outputDiv = document.getElementById('announcement-output');
+            
+            // Disable button and show loading indicator
+            generateButton.disabled = true;
+            generateButton.innerHTML = '<svg class="animate-spin h-5 w-5 mr-3 inline text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Drafting...';
 
-        /** Handles sending a user message. */
-        async function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const userQuery = input.value.trim();
-            const messagesDiv = document.getElementById('chat-messages');
+            outputDiv.innerHTML = '<div class="text-center p-4 text-primary-blue bg-blue-50 rounded-xl">Drafting announcement, please wait...</div>';
 
-            if (!userQuery) return;
+            const systemPrompt = `You are a helpful and professional school administrator for Paññāsāstra International School. Your task is to draft a clear, concise, and friendly school announcement based on the user's key points. The tone should be ${tone}. Use a formal but warm voice and end the announcement with 'Thank you for your cooperation and support. PSIS VH Administration.'`;
 
-            // 1. Display user message
-            appendMessage(userQuery, 'user');
+            const userQuery = `Draft an announcement for the school based on the following key points: "${topic}". The target audience/tone is ${tone}. Please make the key dates/times **bold**.`;
 
-            // 2. Disable input/button and show typing indicator
-            input.disabled = true;
-            document.getElementById('send-btn').disabled = true;
-            addTypingIndicator();
-
-            // 3. Update chat history for the API call
-            chatHistory.push({ role: "user", parts: [{ text: userQuery }] });
-
-            // 4. Call the Gemini API
-            try {
-                const botResponse = await callGeminiApi();
-
-                // 5. Display bot message and update history
-                removeTypingIndicator();
-                appendMessage(botResponse, 'model');
-                chatHistory.push({ role: "model", parts: [{ text: botResponse }] });
-
-            } catch (error) {
-                console.error("Gemini API Error:", error);
-                removeTypingIndicator();
-                appendMessage("Sorry, I'm having trouble connecting to the network right now. Please try again or call us at 093 815 888.", 'model');
-            } finally {
-                // 6. Cleanup
-                input.disabled = false;
-                finishMessage(input, messagesDiv);
-            }
-        }
-
-        /** Calls the Gemini API with the current chat history. */
-        async function callGeminiApi(retryCount = 0) {
-            const maxRetries = 5;
-            const delay = Math.pow(2, retryCount) * 1000;
-
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${API_KEY}`;
+            
             const payload = {
-                contents: chatHistory,
-                systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
             };
 
             try {
-                const response = await fetch(API_URL + apiKey, {
+                const response = await fetchWithRetry(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-
-                if (!response.ok) {
-                    if (response.status === 429 && retryCount < maxRetries) {
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        return callGeminiApi(retryCount + 1);
-                    }
-                    throw new Error(`API call failed with status: ${response.status}`);
-                }
-
+                
                 const result = await response.json();
-                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                if (!text) {
-                     throw new Error("Received empty response from API.");
+                const generatedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (generatedText) {
+                    // Simple markdown text to HTML paragraph conversion (handling bolding from LLM response)
+                    const formattedText = generatedText.split('\n').map(p => {
+                        if (p.trim() === '') return '';
+                        // Replace markdown **bold** with <strong>
+                        const cleanP = p.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        return `<p class="mb-3">${cleanP}</p>`;
+                    }).join('');
+                    
+                    outputDiv.innerHTML = `<div class="p-6 bg-green-50 rounded-xl border border-safe-green text-gray-800">${formattedText}</div>`;
+                } else {
+                    outputDiv.innerHTML = '<div class="p-4 bg-red-100 rounded-xl text-red-700">Sorry, I couldn\'t generate the announcement. Please try again with more details.</div>';
                 }
-
-                return text;
-
+                
             } catch (error) {
-                // If it's a transient error (e.g., network, or 429 after max retries), rethrow
-                if (retryCount >= maxRetries) {
-                    throw new Error("Maximum retries reached. " + error.message);
-                }
-                throw error;
+                console.error('Gemini API Error:', error);
+                outputDiv.innerHTML = '<div class="p-4 bg-red-100 rounded-xl text-red-700">An error occurred while connecting to the drafting service. Please check your network.</div>';
+            } finally {
+                generateButton.disabled = false;
+                generateButton.innerHTML = 'Draft Announcement ✨';
             }
         }
 
-        // --- Existing Modal and Scroll Functions ---
-
-        const openModal = () => {
+        // --- Core Application Logic ---
+        window.openModal = () => {
             document.getElementById('telegram-modal').classList.remove('hidden');
-            document.body.classList.add('overflow-hidden'); // Prevent background scrolling
+            document.body.classList.add('overflow-hidden');
         };
 
-        const closeModal = () => {
+        window.closeModal = () => {
             document.getElementById('telegram-modal').classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
         };
-
+        
         document.addEventListener('DOMContentLoaded', () => {
-            // Auto-Scroll to the contact section on load
+            // Auto-Scroll to the contact section on load (existing feature)
             const targetElement = document.getElementById('contact');
             if (targetElement) {
                 targetElement.scrollIntoView({ behavior: 'smooth' });
             }
-            // Ensure the chat window is positioned correctly on small screens
-            const chatWindow = document.getElementById('chat-window');
-            if (chatWindow) {
-                chatWindow.style.display = 'block'; // Make it block for positioning transition to work
+
+            // New event listener for the LLM tool
+            const generateButton = document.getElementById('generate-announcement-btn');
+            if (generateButton) {
+                generateButton.addEventListener('click', () => {
+                    const topic = document.getElementById('announcement-topic').value.trim();
+                    const tone = document.getElementById('announcement-tone').value;
+
+                    if (topic.length < 10) {
+                        document.getElementById('announcement-output').innerHTML = '<div class="p-4 bg-yellow-100 rounded-xl text-yellow-800">Please provide at least 10 characters for the announcement topic.</div>';
+                        return;
+                    }
+
+                    generateAnnouncement(topic, tone);
+                });
+            }
+
+            // Firebase init for API proxy authentication
+            if (firebaseConfig) {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                
+                if (initialAuthToken) {
+                    signInWithCustomToken(auth, initialAuthToken).catch(err => {
+                        console.error("Firebase custom token sign-in failed:", err);
+                        signInAnonymously(auth).catch(anonErr => console.error("Anonymous sign-in failed:", anonErr));
+                    });
+                } else {
+                    signInAnonymously(auth).catch(anonErr => console.error("Anonymous sign-in failed:", anonErr));
+                }
             }
         });
     </script>
+    <script>
+        // Facebook SDK script (standard)
+        window.fbAsyncInit = function() {
+            FB.init({
+                xfbml            : true,
+                version          : 'v20.0'
+            });
+        };
 
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js';
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
 </body>
 </html>
