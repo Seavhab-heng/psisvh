@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paññāsāstra International School - Van Hong (PSIS VH)</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure Tailwind to use Inter font and custom colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary-blue': '#4F46E5', // Indigo-600 for primary elements
+                        'accent-yellow': '#FBBF24', // Amber-400 for accents
+                        'safe-green': '#10B981', // Emerald-500 for success/safe themes
+                        'bg-light': '#F9FAFB',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scroll behavior for smooth navigation */
+        html {
+            scroll-behavior: smooth;
+        }
+        /* Style for cheerful shadows */
+        .card-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        .card-shadow:hover {
+            transform: translateY(-5px);
+        }
+        /* Ensure the modal content doesn't scroll with the background */
+        .modal-content-container {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        /* Style for the SVG background */
+        .svg-bg {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA07A 100%);
+        }
+
+        /* Chatbot specific styles */
+        #chat-window {
+            height: 80vh;
+            max-height: 500px;
+            width: 100%;
+            max-width: 350px;
+            right: 1rem;
+            bottom: 6rem; /* Space for the FAB and padding */
+            z-index: 90;
+            transition: all 0.3s ease-in-out;
+            transform: translateY(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        #chat-window.open {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        @media (max-width: 640px) {
+            #chat-window {
+                height: 90vh;
+                max-height: none;
+                width: 90%;
+                right: 5%;
+                bottom: 5rem;
+            }
+        }
+        #chat-messages {
+            height: calc(100% - 70px); /* Subtract input height */
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="font-sans bg-bg-light text-gray-800">
+
+    <!-- Telegram Contact Modal (Hidden by default) -->
+    <div id="telegram-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-[100] hidden flex items-center justify-center p-4" onclick="closeModal()">
+        <!-- Modal content container -->
+        <div class="bg-white rounded-xl p-8 max-w-lg w-full transform transition-all duration-300 shadow-2xl modal-content-container" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b pb-4 mb-6">
+                <h3 class="text-2xl font-bold text-primary-blue">Select a Telegram Contact</h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-red-500 transition-colors text-3xl leading-none focus:outline-none">&times;</button>
+            </div>
+            <p class="text-gray-700 mb-6 text-center">Please choose the chat line you wish to contact:</p>
+            
+            <div class="space-y-4">
+                <!-- Telegram Button 1 -->
+                <a href="https://t.me/+85516832588" target="_blank" class="block w-full text-center bg-accent-yellow text-primary-blue py-3 px-6 text-lg font-semibold rounded-lg hover:bg-yellow-300 transition duration-300 shadow-md transform hover:scale-[1.02]">
+                    <span class="text-xl mr-2">&#9992;</span> Telegram Chat (Line 1)
+                </a>
+                <!-- Telegram Button 2 -->
+                <a href="https://t.me/+85593815888" target="_blank" class="block w-full text-center bg-accent-yellow text-primary-blue py-3 px-6 text-lg font-semibold rounded-lg hover:bg-yellow-300 transition duration-300 shadow-md transform hover:scale-[1.02]">
+                    <span class="text-xl mr-2">&#9992;</span> Telegram Chat (Line 2)
+                </a>
+                <!-- Telegram Button 3 -->
+                <a href="https://t.me/+85589663888" target="_blank" class="block w-full text-center bg-accent-yellow text-primary-blue py-3 px-6 text-lg font-semibold rounded-lg hover:bg-yellow-300 transition duration-300 shadow-md transform hover:scale-[1.02]">
+                    <span class="text-xl mr-2">&#9992;</span> Telegram Chat (Line 3)
+                </a>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-sm mt-4 focus:outline-none">Close Window</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation Header (Using PSIS VH) -->
+    <header class="sticky top-0 z-50 bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <!-- School Logo/Icon -->
+                <div class="text-3xl font-extrabold text-accent-yellow transition duration-300 hover:text-primary-blue">
+                    &#10031;
+                </div>
+                <h1 class="text-xl font-bold text-gray-800 hidden sm:block">PSIS VH</h1>
+            </div>
+            <!-- Mobile-friendly Navigation Links -->
+            <nav class="flex space-x-4 text-sm font-medium">
+                <a href="#about" class="text-gray-600 hover:text-primary-blue transition duration-150 p-2 rounded-lg">About</a>
+                <a href="#programs" class="text-gray-600 hover:text-primary-blue transition duration-150 p-2 rounded-lg">Programs</a>
+                <a href="#contact" class="hidden sm:inline-block bg-primary-blue text-white py-2 px-4 rounded-full hover:bg-indigo-700 transition duration-150 shadow-md">Enroll Now</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section (Updated with attractive SVG overlay) -->
+    <section id="hero" class="bg-primary-blue py-12 sm:py-20 lg:py-28 text-white relative overflow-hidden">
+        <!-- Cheerful Background Shapes (Visual flair) -->
+        <div class="absolute inset-0 z-0 opacity-10">
+            <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                <path fill="#ffffff" fill-opacity="0.3" d="M0,192L48,186.7C96,181,192,171,288,181.3C384,192,480,224,576,213.3C672,203,768,149,864,138.7C960,128,1056,160,1152,176C1248,192,1344,192,1392,192L1440,192L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+            </svg>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <!-- Text Content -->
+                <div class="text-center lg:text-left">
+                    <h2 class="text-4xl sm:text-6xl font-extrabold leading-tight tracking-tight">
+                        <span class="text-accent-yellow">Learn with Joy!</span> Grow with Warmth!
+                    </h2>
+                    <p class="mt-4 text-xl sm:text-2xl font-light opacity-90">
+                        Paññāsāstra International School - Van Hong: A nurturing atmosphere for children to grow with confidence and happiness.
+                    </p>
+                    <a href="#contact" class="mt-8 inline-block bg-accent-yellow text-primary-blue py-3 px-8 text-lg font-semibold rounded-full hover:bg-yellow-300 transition duration-300 transform hover:scale-105 shadow-xl">
+                        Schedule a Tour Today!
+                    </a>
+                </div>
+                <!-- Joyful Learner SVG Visual -->
+                <div class="hidden lg:flex justify-center">
+                    <div class="w-full max-w-sm h-80 svg-bg p-4 rounded-3xl card-shadow flex items-center justify-center shadow-2xl relative overflow-hidden">
+                        <!-- Stylized SVG of a happy child -->
+                        <svg class="w-full h-full text-white" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="100" height="100" rx="15" fill="none"/>
+                            <!-- Happy Face -->
+                            <circle cx="50" cy="40" r="25" fill="#FFEAA7"/>
+                            <!-- Hair/Hat -->
+                            <path d="M70 30 C75 15, 60 10, 50 10 C40 10, 25 15, 30 30 Z" fill="#E65100"/>
+                            <!-- Eyes -->
+                            <circle cx="42" cy="38" r="3" fill="#4F46E5"/>
+                            <circle cx="58" cy="38" r="3" fill="#4F46E5"/>
+                            <!-- Smile -->
+                            <path d="M40 50 Q50 60, 60 50" stroke="#D32F2F" stroke-width="3" stroke-linecap="round"/>
+                            <!-- Body (Playful Overalls) -->
+                            <rect x="30" y="60" width="40" height="30" rx="5" fill="#4F46E5"/>
+                            <!-- Arms Waving -->
+                            <path d="M30 65 Q15 75, 20 85" stroke="#FFEAA7" stroke-width="6" stroke-linecap="round"/>
+                            <path d="M70 65 Q85 75, 80 85" stroke="#FFEAA7" stroke-width="6" stroke-linecap="round"/>
+                            <!-- Star decoration -->
+                            <path d="M50 20 L53 27 L60 28 L55 33 L56 40 L50 36 L44 40 L45 33 L40 28 L47 27 Z" fill="#FBBF24"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section (Updated Curriculum & Registration) -->
+    <section id="about" class="py-16 sm:py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Our <span class="text-safe-green">School Overview</span></h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+                    We believe in holistic development, fostering curiosity, creativity, and confidence in all our students.
+                </p>
+            </div>
+            
+            <!-- School Range & Curriculum Information (Updated) -->
+            <div class="mt-10 p-6 sm:p-8 bg-primary-blue/10 rounded-xl border-l-4 border-primary-blue text-center max-w-3xl mx-auto">
+                <h3 class="text-2xl font-bold text-primary-blue mb-3">Comprehensive Education, Nursery to Grade 12</h3>
+                <p class="text-gray-700 font-extrabold text-lg">
+                    We proudly offer a **3-LANGUAGE CURRICULUM**: <span class="text-safe-green">Khmer</span>, <span class="text-safe-green">English</span>, and <span class="text-safe-green">Chinese</span>.
+                </p>
+                <p class="mt-4 text-gray-800 font-bold bg-accent-yellow/50 inline-block px-3 py-1 rounded-lg shadow-md">
+                    Accepting Registration Every Day!
+                </p>
+                <p class="mt-2 text-gray-700 font-medium">
+                    Our programs span from **Nursery to Kindergarten (K)** and continue through **Grade 1 to Grade 12**, with full-time and part-time options available.
+                </p>
+            </div>
+            
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="p-6 bg-bg-light rounded-2xl card-shadow text-center">
+                    <div class="text-4xl text-safe-green mb-4">&#127775;</div>
+                    <h3 class="text-xl font-bold text-gray-900">Play-Based Learning</h3>
+                    <p class="mt-2 text-gray-600">
+                        Children explore concepts through hands-on activities and imaginative play, making education enjoyable.
+                    </p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="p-6 bg-bg-light rounded-2xl card-shadow text-center">
+                    <div class="text-4xl text-primary-blue mb-4">&#128170;</div>
+                    <h3 class="text-xl font-bold text-gray-900">Social-Emotional Growth</h3>
+                    <p class="mt-2 text-gray-600">
+                        Focuses on empathy, sharing, and communication skills to build strong social foundations.
+                    </p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="p-6 bg-bg-light rounded-2xl card-shadow text-center">
+                    <div class="text-4xl text-accent-yellow mb-4">&#128218;</div>
+                    <h3 class="text-xl font-bold text-gray-900">Individualized Attention</h3>
+                    <p class="mt-2 text-gray-600">
+                        Small class sizes ensure every child receives the personalized guidance they need to thrive.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Programs/Curriculum Section -->
+    <section id="programs" class="py-16 sm:py-24 bg-primary-blue bg-opacity-5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Our <span class="text-primary-blue">Programs</span></h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+                    We offer flexible programs designed for various age groups and developmental stages.
+                </p>
+            </div>
+
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Program 1 -->
+                <div class="bg-white p-6 rounded-2xl card-shadow border-t-4 border-safe-green">
+                    <h3 class="text-2xl font-bold text-safe-green">Toddler Discovery (2-3 Yrs)</h3>
+                    <p class="mt-3 text-gray-600">
+                        Focuses on sensory exploration, basic language, and motor skill development in a supportive environment.
+                    </p>
+                    <ul class="mt-4 space-y-2 text-sm text-gray-700 list-inside">
+                        <li>&#x2714; Sensory Bins & Music</li>
+                        <li>&#x2714; Basic Routine Building</li>
+                    </ul>
+                </div>
+                <!-- Program 2 -->
+                <div class="bg-white p-6 rounded-2xl card-shadow border-t-4 border-primary-blue">
+                    <h3 class="text-2xl font-bold text-primary-blue">Pre-K Readiness (3-4 Yrs)</h3>
+                    <p class="mt-3 text-gray-600">
+                        Introducing letters, numbers, and early math concepts through interactive and creative methods.
+                    </p>
+                    <ul class="mt-4 space-y-2 text-sm text-gray-700 list-inside">
+                        <li>&#x2714; Phonics and Storytelling</li>
+                        <li>&#x2714; Group Projects & Art</li>
+                    </ul>
+                </div>
+                <!-- Program 3 -->
+                <div class="bg-white p-6 rounded-2xl card-shadow border-t-4 border-accent-yellow">
+                    <h3 class="text-2xl font-bold text-accent-yellow">Kindergarten Prep (4-5 Yrs)</h3>
+                    <p class="mt-3 text-gray-600">
+                        A comprehensive curriculum ensuring students are fully prepared for elementary school success.
+                    </p>
+                    <ul class="mt-4 space-y-2 text-sm text-gray-700 list-inside">
+                        <li>&#x2714; Early Literacy & Math</li>
+                        <li>&#x2714; Science & Nature Walks</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-16 sm:py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">What Parents Are Saying</h2>
+            </div>
+            <div class="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="p-6 bg-bg-light rounded-2xl border-l-4 border-accent-yellow italic text-gray-700 shadow-md">
+                    "Since starting at PSIS VH, my son has become more confident and excited about learning. The teachers are fantastic!"
+                    <p class="mt-4 font-semibold text-gray-900 text-sm">- Sarah K., Proud Parent</p>
+                </div>
+                <!-- Testimonial 2 -->
+                <div class="p-6 bg-bg-light rounded-2xl border-l-4 border-safe-green italic text-gray-700 shadow-md">
+                    "The focus on emotional intelligence is what sold us. Our daughter is thriving socially and academically at PSIS VH. Highly recommend!"
+                    <p class="mt-4 font-semibold text-gray-900 text-sm">- David L., Happy Dad</p>
+                </div>
+                <!-- Testimonial 3 -->
+                <div class="p-6 bg-bg-light rounded-2xl border-l-4 border-primary-blue italic text-gray-700 shadow-md">
+                    "The school environment feels safe, warm, and truly nurturing. It's the perfect 'home away from home' for our little one."
+                    <p class="mt-4 font-semibold text-gray-900 text-sm">- Maria P., Enthusiastic Mom</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact & Call to Action Section -->
+    <section id="contact" class="py-16 sm:py-24 bg-primary-blue text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl sm:text-5xl font-extrabold">Ready to Join the PSIS VH Family?</h2>
+            <p class="mt-4 text-xl opacity-90 max-w-3xl mx-auto">
+                Spaces are limited! Contact us today to learn more about our enrollment process and book a personal visit.
+            </p>
+
+            <!-- Contact Buttons (Call and Telegram only) -->
+            <div class="mt-8 flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+                <!-- Call Button -->
+                <a href="tel:093815888" class="w-full sm:w-auto flex-grow sm:flex-grow-0 flex items-center justify-center bg-safe-green text-white py-3 px-6 text-lg font-semibold rounded-full hover:bg-emerald-600 transition duration-300 transform hover:scale-105 shadow-xl">
+                    Call Us: 093 815 888
+                </a>
+                
+                <!-- SINGLE TELEGRAM BUTTON (Triggers Modal) -->
+                <button onclick="openModal()" class="w-full sm:w-auto flex-grow sm:flex-grow-0 flex items-center justify-center bg-accent-yellow text-primary-blue py-3 px-6 text-lg font-semibold rounded-full hover:bg-yellow-300 transition duration-300 transform hover:scale-105 shadow-xl">
+                    <span class="text-xl mr-2">&#9992;</span> Chat on Telegram
+                </button>
+            </div>
+
+            <!-- Map Iframe -->
+            <div class="mt-10 w-full max-w-4xl mx-auto rounded-xl overflow-hidden card-shadow">
+                <iframe
+                    title="School Location Map"
+                    src="https://maps.google.com/maps?q=Building%20582,%20National%20Road%201,%20Phum%20Kdai%20Takoy,%20Sangkat%20Veal%20Sbov,%20Khan%20Chbar%20Ampov,%20Phnom%20Penh&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                    width="100%"
+                    height="300"
+                    frameborder="0"
+                    style="border:0;"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+            
+            <!-- Directions Button -->
+            <a href="https://maps.app.goo.gl/ZPzMsm9VEwvoVb8V8" target="_blank" class="mt-6 inline-block bg-safe-green text-white py-3 px-8 text-lg font-semibold rounded-full hover:bg-emerald-600 transition duration-300 transform hover:scale-105 shadow-xl">
+                <span class="text-xl mr-2">&#128205;</span> Get Directions on Google Maps
+            </a>
+
+
+            <!-- Updated Address -->
+            <div class="mt-8 text-center text-sm opacity-80">
+                <p class="font-bold mb-1">Main Campus Address:</p>
+                <p>Building 582, National Road 1, Phum Kdai Takoy, Sangkat Veal Sbov, Khan Chbar Ampov, Phnom Penh</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- --- CHATBOT WIDGET START --- -->
+    
+    <!-- Chat Window (Floating, fixed position) -->
+    <div id="chat-window" class="fixed rounded-lg shadow-2xl bg-white flex flex-col hidden">
+        <div class="p-4 bg-primary-blue text-white rounded-t-lg flex justify-between items-center">
+            <span class="font-bold text-lg">PSIS VH Admissions Advisor</span>
+            <button onclick="toggleChat()" class="text-xl font-bold leading-none">&times;</button>
+        </div>
+        <div id="chat-messages" class="flex-grow p-4 space-y-4">
+            <!-- Initial welcome message -->
+            <div class="flex justify-start">
+                <div class="bg-gray-200 text-gray-800 p-3 rounded-xl rounded-tl-none max-w-[80%] shadow-sm">
+                    Hello! I'm your Admissions Advisor for Paññāsāstra International School - Van Hong. How can I help you and your child today?
+                </div>
+            </div>
+        </div>
+        <div class="p-3 border-t">
+            <div class="relative">
+                <input type="text" id="chat-input" placeholder="Ask about programs, curriculum, or enrollment..." 
+                       class="w-full py-2 pl-3 pr-10 border border-gray-300 rounded-full focus:ring-primary-blue focus:border-primary-blue"
+                       onkeydown="if(event.key === 'Enter') sendMessage()">
+                <button onclick="sendMessage()" id="send-btn" class="absolute right-0 top-0 mt-2 mr-3 text-primary-blue hover:text-indigo-700 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                        <path d="M3.478 2.405a.75.75 0 0 0-.926.94l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.599 60.599 0 0 0 18.442-8.685.75.75 0 0 0 0-1.218A60.599 60.599 0 0 0 3.478 2.405Z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Chat Button (FAB) -->
+    <button onclick="toggleChat()" class="fixed right-4 bottom-4 w-14 h-14 bg-accent-yellow text-primary-blue rounded-full shadow-2xl flex items-center justify-center text-3xl hover:bg-yellow-300 transition duration-300 z-50 transform hover:scale-110">
+        &#9993;
+    </button>
+
+    <!-- --- CHATBOT WIDGET END --- -->
+
+    <!-- Footer (Updated Name) -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-sm flex-col sm:flex-row">
+            <p>&copy; 2025 Paññāsāstra International School - Van Hong (PSIS VH). All Rights Reserved.</p>
+            <div class="mt-3 sm:mt-0 space-x-4">
+                <a href="#" class="hover:text-accent-yellow transition duration-150">Privacy Policy</a>
+                <span class="text-gray-600">|</span>
+                <a href="#" class="hover:text-accent-yellow transition duration-150">Sitemap</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Auto-Scroll, Modal, and Chatbot Script -->
+    <script>
+        let chatHistory = [];
+        const SYSTEM_PROMPT = `You are an Admissions Advisor for Paññāsāstra International School - Van Hong (PSIS VH). Your goal is to be friendly, encouraging, and provide accurate, concise information to prospective parents.
+
+Core Facts to Use:
+1.  **Full Name:** Paññāsāstra International School - Van Hong. (Short name: PSIS VH).
+2.  **Motto/Atmosphere:** "Learn with joy! A good atmosphere provides warmth! A place for children to grow with joy!"
+3.  **Curriculum:** Offers a 3-language curriculum: Khmer, English, and Chinese.
+4.  **Programs:** Nursery up to Grade 12.
+5.  **Registration:** Accepting registration every day.
+
+Always encourage parents to use the contact information on the page (e.g., call 093 815 888 or use Telegram) for tours or enrollment. Keep responses professional, warm, and brief.`;
+        
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=";
+        const apiKey = ""; // API key will be provided by the environment
+
+        // --- Utility Functions ---
+
+        /** Toggles the chat window visibility. */
+        function toggleChat() {
+            const chatWindow = document.getElementById('chat-window');
+            chatWindow.classList.toggle('open');
+            chatWindow.classList.toggle('hidden');
+        }
+
+        /** Clears the input and scrolls messages to the bottom. */
+        function finishMessage(input, messagesDiv) {
+            input.value = '';
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            document.getElementById('send-btn').disabled = false;
+        }
+
+        /** Creates and appends a message bubble to the chat window. */
+        function appendMessage(text, role) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageWrapper = document.createElement('div');
+            const messageBubble = document.createElement('div');
+            
+            // Apply role-specific styling
+            if (role === 'user') {
+                messageWrapper.className = 'flex justify-end';
+                messageBubble.className = 'bg-primary-blue text-white p-3 rounded-xl rounded-br-none max-w-[80%] shadow-md';
+            } else {
+                messageWrapper.className = 'flex justify-start';
+                messageBubble.className = 'bg-gray-200 text-gray-800 p-3 rounded-xl rounded-tl-none max-w-[80%] shadow-sm';
+            }
+
+            // Convert text to Markdown for display (supports bold, lists)
+            messageBubble.innerHTML = formatMarkdown(text); 
+            
+            messageWrapper.appendChild(messageBubble);
+            messagesDiv.appendChild(messageWrapper);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        /** Simple Markdown to HTML conversion for display. */
+        function formatMarkdown(text) {
+            // Bold
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Basic line breaks
+            text = text.replace(/\n/g, '<br>');
+            return text;
+        }
+
+        /** Adds a typing indicator for the bot. */
+        function addTypingIndicator() {
+            const messagesDiv = document.getElementById('chat-messages');
+            const indicator = document.createElement('div');
+            indicator.id = 'typing-indicator';
+            indicator.className = 'flex justify-start';
+            indicator.innerHTML = `
+                <div class="bg-gray-200 text-gray-800 p-3 rounded-xl rounded-tl-none max-w-[80%] shadow-sm flex items-center space-x-2">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+            `;
+            messagesDiv.appendChild(indicator);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        /** Removes the typing indicator. */
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        // --- Core Chat Functions ---
+
+        /** Handles sending a user message. */
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const userQuery = input.value.trim();
+            const messagesDiv = document.getElementById('chat-messages');
+
+            if (!userQuery) return;
+
+            // 1. Display user message
+            appendMessage(userQuery, 'user');
+            
+            // 2. Disable input/button and show typing indicator
+            input.disabled = true;
+            document.getElementById('send-btn').disabled = true;
+            addTypingIndicator();
+            
+            // 3. Update chat history for the API call
+            chatHistory.push({ role: "user", parts: [{ text: userQuery }] });
+            
+            // 4. Call the Gemini API
+            try {
+                const botResponse = await callGeminiApi();
+                
+                // 5. Display bot message and update history
+                removeTypingIndicator();
+                appendMessage(botResponse, 'model');
+                chatHistory.push({ role: "model", parts: [{ text: botResponse }] });
+
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                removeTypingIndicator();
+                appendMessage("Sorry, I'm having trouble connecting to the network right now. Please try again or call us at 093 815 888.", 'model');
+            } finally {
+                // 6. Cleanup
+                input.disabled = false;
+                finishMessage(input, messagesDiv);
+            }
+        }
+
+        /** Calls the Gemini API with the current chat history. */
+        async function callGeminiApi(retryCount = 0) {
+            const maxRetries = 5;
+            const delay = Math.pow(2, retryCount) * 1000;
+
+            const payload = {
+                contents: chatHistory,
+                systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+            };
+
+            try {
+                const response = await fetch(API_URL + apiKey, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    if (response.status === 429 && retryCount < maxRetries) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        return callGeminiApi(retryCount + 1);
+                    }
+                    throw new Error(`API call failed with status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (!text) {
+                     throw new Error("Received empty response from API.");
+                }
+
+                return text;
+
+            } catch (error) {
+                // If it's a transient error (e.g., network, or 429 after max retries), rethrow
+                if (retryCount >= maxRetries) {
+                    throw new Error("Maximum retries reached. " + error.message);
+                }
+                throw error;
+            }
+        }
+
+        // --- Existing Modal and Scroll Functions ---
+
+        const openModal = () => {
+            document.getElementById('telegram-modal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden'); // Prevent background scrolling
+        };
+
+        const closeModal = () => {
+            document.getElementById('telegram-modal').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto-Scroll to the contact section on load
+            const targetElement = document.getElementById('contact');
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth' });
+            }
+            // Ensure the chat window is positioned correctly on small screens
+            const chatWindow = document.getElementById('chat-window');
+            if (chatWindow) {
+                chatWindow.style.display = 'block'; // Make it block for positioning transition to work
+            }
+        });
+    </script>
+
+</body>
+</html>
