@@ -3,279 +3,416 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI School Announcement Generator</title>
+    
+    <!-- FAVICON IMPLEMENTATION: New Icon URLs from psisvh.vercel.app -->
+    <link rel="apple-touch-icon" sizes="180x180" href="https://psisvh.vercel.app/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://psisvh.vercel.app/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://psisvh.vercel.app/favicon-16x16.png">
+    <link rel="shortcut icon" href="https://psisvh.vercel.app/favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://psisvh.vercel.app/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://psisvh.vercel.app/android-chrome-512x512.png">
+    
+    <title>Paññāsāstra International School - Van Hong (PSIS VH)</title>
+    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f9fb;
-        }
-        .container {
-            max-width: 900px;
-            padding: 1rem;
-        }
-        .card {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-        }
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #10b981;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        /* Mobile adjustments */
-        @media (max-width: 640px) {
-            .card {
-                padding: 1rem;
+    <!-- Configure Tailwind to use Inter font and custom colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary-blue': '#4F46E5', // Indigo-600 for primary elements
+                        'accent-yellow': '#FBBF24', // Amber-400 for accents
+                        'safe-green': '#10B981', // Emerald-500 for success/safe themes
+                        'bg-light': '#F9FAFB',
+                    }
+                }
             }
+        }
+    </script>
+    <style>
+        /* Custom scroll behavior for smooth navigation */
+        html {
+            scroll-behavior: smooth;
+        }
+        /* Style for cheerful shadows */
+        .card-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        .card-shadow:hover {
+            transform: translateY(-5px);
+        }
+        /* Ensure the modal content doesn't scroll with the background */
+        .modal-content-container {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        /* Style for the SVG background */
+        .svg-bg {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA07A 100%);
         }
     </style>
 </head>
-<body>
-    <div class="container mx-auto mt-8 md:mt-12">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl font-extrabold text-gray-800">School Communication AI</h1>
-            <p class="text-gray-500 mt-2">Instantly draft announcements for any school event.</p>
-        </header>
+<body class="font-sans bg-bg-light text-gray-800">
 
-        <div class="card grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Input Form -->
-            <div class="space-y-6">
-                <h2 class="text-2xl font-semibold text-gray-700 border-b pb-3 mb-4">Drafting Parameters</h2>
-
-                <div>
-                    <label for="topic" class="block text-sm font-medium text-gray-700 mb-1">1. Announcement Topic / Event</label>
-                    <input type="text" id="topic" value="Upcoming School Book Fair" placeholder="e.g., Parent-Teacher Interviews, School Closure, Field Trip" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150">
-                </div>
-
-                <div>
-                    <label for="details" class="block text-sm font-medium text-gray-700 mb-1">2. Key Details & Instructions</label>
-                    <textarea id="details" rows="4" placeholder="Date: Oct 28 - Nov 1. Location: School Library. Need volunteers. Books starting at $1." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150">Date: Tuesday, Nov 5th to Friday, Nov 8th. Location: School Library. Hours: 3:00 PM - 5:00 PM. All proceeds go to new playground equipment. Parents can pre-order online.</textarea>
-                    <p class="text-xs text-gray-500 mt-1">Include all crucial information here (dates, times, actions needed).</p>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label for="audience" class="block text-sm font-medium text-gray-700 mb-1">3. Audience</label>
-                        <select id="audience" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 appearance-none">
-                            <option value="Parents and Guardians" selected>Parents & Guardians</option>
-                            <option value="School Staff and Faculty">School Staff & Faculty</option>
-                            <option value="Students">Students (Age-appropriate)</option>
-                            <option value="Community Members">Community Members</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="tone" class="block text-sm font-medium text-gray-700 mb-1">4. Desired Tone</label>
-                        <select id="tone" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 appearance-none">
-                            <option value="Friendly and Warm" selected>Friendly and Warm</option>
-                            <option value="Formal and Professional">Formal and Professional</option>
-                            <option value="Urgent and Action-Oriented">Urgent and Action-Oriented</option>
-                            <option value="Encouraging and Enthusiastic">Encouraging and Enthusiastic</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Removed onclick="handleGenerateClick()" -->
-                <button id="generateBtn" class="w-full bg-emerald-600 text-white font-semibold py-3 rounded-lg hover:bg-emerald-700 transition duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg">
-                    <span id="buttonText">Generate Announcement</span>
-                    <div id="loadingSpinner" class="hidden loading-spinner"></div>
-                </button>
-                <div id="errorBox" class="text-red-600 bg-red-100 p-3 rounded-lg hidden" role="alert"></div>
+    <!-- Telegram Contact Modal (Hidden by default) -->
+    <div id="telegram-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-[100] hidden flex items-center justify-center p-4" onclick="closeModal()">
+        <!-- Modal content container -->
+        <div class="bg-white rounded-xl p-8 max-w-lg w-full transform transition-all duration-300 shadow-2xl modal-content-container" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b pb-4 mb-6">
+                <h3 class="text-2xl font-bold text-primary-blue">Select a Telegram Contact</h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-red-500 transition-colors text-3xl leading-none focus:outline-none">&times;</button>
             </div>
-
-            <!-- Output Display -->
-            <div class="lg:border-l lg:pl-8">
-                <h2 class="text-2xl font-semibold text-gray-700 border-b pb-3 mb-4">Drafted Announcement</h2>
-                <div id="outputContainer" class="min-h-[250px] bg-gray-50 p-4 border border-gray-200 rounded-lg whitespace-pre-wrap text-gray-800 leading-relaxed text-sm">
-                    Your drafted announcement will appear here after clicking 'Generate Announcement'.
-                </div>
-                <div id="sourcesContainer" class="mt-4 pt-4 border-t border-gray-200 text-xs text-gray-500 hidden">
-                    <p class="font-medium mb-1">Sources Used (for grounding factual information):</p>
-                    <ul id="sourcesList" class="list-disc ml-4 space-y-1"></ul>
-                </div>
+            <p class="text-gray-700 mb-6 text-center">Please choose the chat line you wish to contact:</p>
+            
+            <div class="space-y-4">
+                <!-- Telegram Button 1 -->
+                <a href="https://t.me/+85516832588" target="_blank" class="block w-full text-center bg-accent-yellow text-primary-blue py-3 px-6 text-lg font-semibold rounded-lg hover:bg-yellow-300 transition duration-300 shadow-md transform hover:scale-[1.02]">
+                    <span class="text-xl mr-2">&#9992;</span> Telegram Chat (Line 1)
+                </a>
+                <!-- Telegram Button 2 -->
+                <a href="https://t.me/+85593815888" target="_blank" class="block w-full text-center bg-accent-yellow text-primary-blue py-3 px-6 text-lg font-semibold rounded-lg hover:bg-yellow-300 transition duration-300 transform hover:scale-[1.02]">
+                    <span class="text-xl mr-2">&#9992;</span> Telegram Chat (Line 2)
+                </a>
+                <!-- Telegram Button 3 -->
+                <a href="https://t.me/+85589663888" target="_blank" class="block w-full text-center bg-accent-yellow text-primary-blue py-3 px-6 text-lg font-semibold rounded-lg hover:bg-yellow-300 transition duration-300 transform hover:scale-[1.02]">
+                    <span class="text-xl mr-2">&#9992;</span> Chat (Line 3)
+                </a>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-sm mt-4 focus:outline-none">Close Window</button>
             </div>
         </div>
     </div>
+    
+    <!-- Navigation Header (Using PSIS VH) -->
+    <header class="sticky top-0 z-50 bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <!-- School Logo/Icon: Using the provided external URL -->
+                <img src="https://psisvh.vercel.app/logo.png" alt="PSIS VH School Logo" class="h-8 w-8 object-contain transition duration-300 transform hover:scale-105" />
+                <h1 class="text-xl font-bold text-gray-800 hidden sm:block">PSIS VH</h1>
+            </div>
+            <!-- Mobile-friendly Navigation Links -->
+            <nav class="flex space-x-4 text-sm font-medium">
+                <a href="#about" class="text-gray-600 hover:text-primary-blue transition duration-150 p-2 rounded-lg">About</a>
+                <a href="#programs" class="text-gray-600 hover:text-primary-blue transition duration-150 p-2 rounded-lg">Programs</a>
+                <a href="#contact" class="hidden sm:inline-block bg-primary-blue text-white py-2 px-4 rounded-full hover:bg-indigo-700 transition duration-150 shadow-md">Enroll Now</a>
+            </nav>
+        </div>
+    </header>
 
-    <script type="module">
-        // API Configuration (Mandatory global variables)
-        const apiKey = ""; // Leave as-is, Canvas will provide key at runtime
-        const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=" + apiKey;
+    <!-- Hero Section -->
+    <section id="hero" class="bg-primary-blue py-12 sm:py-20 lg:py-28 text-white relative overflow-hidden">
+        <!-- Cheerful Background Shapes (Visual flair) -->
+        <div class="absolute inset-0 z-0 opacity-10">
+            <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                <path fill="#ffffff" fill-opacity="0.3" d="M0,192L48,186.7C96,181,192,171,288,181.3C384,192,480,224,576,213.3C672,203,768,149,864,138.7C960,128,1056,160,1152,176C1248,192,1344,192,1392,192L1440,192L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+            </svg>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <!-- Text Content -->
+                <div class="text-center lg:text-left">
+                    <h2 class="text-4xl sm:text-6xl font-extrabold leading-tight tracking-tight">
+                        <span class="text-accent-yellow">Learn with Joy!</span> Grow with Warmth!
+                    </h2>
+                    <p class="mt-4 text-xl sm:text-2xl font-light opacity-90">
+                        Paññāsāstra International School - Van Hong: A nurturing atmosphere for children to grow with confidence and happiness.
+                    </p>
+                    <a href="#contact" class="mt-8 inline-block bg-accent-yellow text-primary-blue py-3 px-8 text-lg font-semibold rounded-full hover:bg-yellow-300 transition duration-300 transform hover:scale-105 shadow-xl">
+                        Schedule a Tour Today!
+                    </a>
+                </div>
+                <!-- Joyful Learner SVG Visual -->
+                <div class="hidden lg:flex justify-center">
+                    <div class="w-full max-w-sm h-80 svg-bg p-4 rounded-3xl card-shadow flex items-center justify-center shadow-2xl relative overflow-hidden">
+                        <!-- Stylized SVG of a happy child -->
+                        <svg class="w-full h-full text-white" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="100" height="100" rx="15" fill="none"/>
+                            <!-- Happy Face -->
+                            <circle cx="50" cy="40" r="25" fill="#FFEAA7"/>
+                            <!-- Hair/Hat -->
+                            <path d="M70 30 C75 15, 60 10, 50 10 C40 10, 25 15, 30 30 Z" fill="#E65100"/>
+                            <!-- Eyes -->
+                            <circle cx="42" cy="38" r="3" fill="#4F46E5"/>
+                            <circle cx="58" cy="38" r="3" fill="#4F46E5"/>
+                            <!-- Smile -->
+                            <path d="M40 50 Q50 60, 60 50" stroke="#D32F2F" stroke-width="3" stroke-linecap="round"/>
+                            <!-- Body (Playful Overalls) -->
+                            <rect x="30" y="60" width="40" height="30" rx="5" fill="#4F46E5"/>
+                            <!-- Arms Waving -->
+                            <path d="M30 65 Q15 75, 20 85" stroke="#FFEAA7" stroke-width="6" stroke-linecap="round"/>
+                            <path d="M70 65 Q85 75, 80 85" stroke="#FFEAA7" stroke-width="6" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        const button = document.getElementById('generateBtn');
-        const buttonText = document.getElementById('buttonText');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const outputContainer = document.getElementById('outputContainer');
-        const errorBox = document.getElementById('errorBox');
-        const sourcesContainer = document.getElementById('sourcesContainer');
-        const sourcesList = document.getElementById('sourcesList');
-        
-        // Utility function for exponential backoff
-        const MAX_RETRIES = 5;
-        const INITIAL_DELAY_MS = 1000;
-
-        async function fetchWithBackoff(url, options) {
-            for (let i = 0; i < MAX_RETRIES; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (response.ok) {
-                        return response;
-                    }
-                    if (response.status === 429 || response.status >= 500) {
-                        // Rate limit or server error, try again
-                        const delay = INITIAL_DELAY_MS * Math.pow(2, i) + Math.random() * 1000;
-                        // Template literal removed
-                        console.warn('API request failed with status ' + response.status + '. Retrying in ' + (delay / 1000).toFixed(1) + 's...');
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        continue;
-                    }
-                    // Non-retriable error
-                    const errorJson = await response.json();
-                    // Template literal removed
-                    throw new Error('API request failed: ' + response.status + ' - ' + (errorJson.error.message || response.statusText));
-                } catch (error) {
-                    if (i === MAX_RETRIES - 1) {
-                        throw error;
-                    }
-                    // Handle network errors before retrying
-                    const delay = INITIAL_DELAY_MS * Math.pow(2, i) + Math.random() * 1000;
-                    // Template literal removed
-                    console.warn('Network error on API call. Retrying in ' + (delay / 1000).toFixed(1) + 's...');
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                }
-            }
-        }
-
-        function toggleLoading(isLoading) {
-            button.disabled = isLoading;
-            loadingSpinner.classList.toggle('hidden', !isLoading);
-            buttonText.textContent = isLoading ? 'Drafting...' : 'Generate Announcement';
-            errorBox.classList.add('hidden');
-        }
-
-        function displayError(message) {
-            // Template literal removed
-            errorBox.textContent = 'Error: ' + message;
-            errorBox.classList.remove('hidden');
-            outputContainer.textContent = "Could not generate announcement. Please check your inputs and try again.";
-        }
-        
-        function extractSources(candidate) {
-            const sources = [];
-            const groundingMetadata = candidate.groundingMetadata;
-            if (groundingMetadata && groundingMetadata.groundingAttributions) {
-                groundingMetadata.groundingAttributions.forEach(attribution => {
-                    if (attribution.web?.uri && attribution.web?.title) {
-                        sources.push({
-                            uri: attribution.web.uri,
-                            title: attribution.web.title
-                        });
-                    }
-                });
-            }
-            return sources;
-        }
-
-        // Changed from window.handleGenerateClick to module-scoped function
-        async function handleGenerateClick() {
-            toggleLoading(true);
-            outputContainer.textContent = "Drafting the perfect announcement...";
-            sourcesContainer.classList.add('hidden');
-            sourcesList.innerHTML = '';
-
-            const topic = document.getElementById('topic').value.trim();
-            const details = document.getElementById('details').value.trim();
-            const audience = document.getElementById('audience').value;
-            const tone = document.getElementById('tone').value;
-
-            if (!topic || !details) {
-                toggleLoading(false);
-                displayError("Please provide both a Topic and Key Details to draft the announcement.");
-                return;
-            }
-
-            try {
-                // 1. Define the LLM's role and tone (System Instruction) - Template literal removed
-                const systemPrompt = 'You are a professional school communication specialist. Your tone must be strictly ' + tone + '. The primary audience is ' + audience + '. Structure the output with a bold title, a clear introductory statement, and well-formatted key information points. Do not include any introductory or concluding conversational text, only the announcement itself.';
-
-                // 2. Define the user's specific task (User Query) - Template literal removed
-                const userQuery = 'Please draft the full announcement about the following event/topic: "' + topic + '". The essential details and instructions that must be included are: "' + details + '".';
-
-                const payload = {
-                    contents: [{ parts: [{ text: userQuery }] }],
-                    
-                    // Enable Google Search grounding for real-time information access
-                    tools: [{ "google_search": {} }],
-                    
-                    systemInstruction: {
-                        parts: [{ text: systemPrompt }]
-                    },
-                };
-
-                const response = await fetchWithBackoff(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-                const candidate = result.candidates?.[0];
-
-                if (candidate && candidate.content?.parts?.[0]?.text) {
-                    const generatedText = candidate.content.parts[0].text;
-                    outputContainer.textContent = generatedText;
-
-                    // Extract and display sources if available
-                    const sources = extractSources(candidate);
-                    if (sources.length > 0) {
-                        sources.forEach(source => {
-                            const li = document.createElement('li');
-                            const a = document.createElement('a');
-                            a.href = source.uri;
-                            a.target = "_blank";
-                            a.rel = "noopener noreferrer";
-                            a.textContent = source.title || source.uri;
-                            a.className = "text-blue-600 hover:text-blue-800 underline";
-                            li.appendChild(a);
-                            sourcesList.appendChild(li);
-                        });
-                        sourcesContainer.classList.remove('hidden');
-                    }
-                } else {
-                    displayError("The drafting service returned an unexpected or empty response.");
-                    console.error("API Response Error:", result);
-                }
-
-            } catch (error) {
-                displayError(error.message || "A network error occurred while reaching the AI service.");
-                console.error("Fetch Error:", error);
-            } finally {
-                toggleLoading(false);
-            }
-        }
-
-        // Setup event listeners and initial run inside DOMContentLoaded for module compatibility
-        document.addEventListener('DOMContentLoaded', () => {
-            const generateButton = document.getElementById('generateBtn');
-            if (generateButton) {
-                generateButton.addEventListener('click', handleGenerateClick);
-            }
+    <!-- About Us Section -->
+    <section id="about" class="py-16 sm:py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Our <span class="text-safe-green">School Overview</span></h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+                    We believe in holistic development, fostering curiosity, creativity, and confidence in all our students.
+                </p>
+            </div>
             
-            // Auto-run the initial generation (from the original window.onload)
-            setTimeout(handleGenerateClick, 50); 
-        });
+            <!-- School Range & Curriculum Information -->
+            <div class="mt-10 p-6 sm:p-8 bg-primary-blue/10 rounded-xl border-l-4 border-primary-blue text-center max-w-3xl mx-auto">
+                <h3 class="text-2xl font-bold text-primary-blue mb-3">Comprehensive Education, Nursery to Grade 12</h3>
+                <p class="text-gray-700 font-extrabold text-lg">
+                    We proudly offer a **3-LANGUAGE CURRICULUM**: <span class="text-safe-green">Khmer</span>, <span class="text-safe-green">English</span>, and <span class="text-safe-green">Chinese</span>.
+                </p>
+                <p class="mt-4 text-gray-800 font-bold bg-accent-yellow/50 inline-block px-3 py-1 rounded-lg shadow-md">
+                    Accepting Registration Every Day!
+                </p>
+                <p class="mt-2 text-gray-700 font-medium">
+                    Our programs span from **Nursery to Kindergarten (K)** and continue through **Grade 1 to Grade 12**, with full-time and part-time options available.
+                </p>
+            </div>
+            
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1 - Icon changed to Book -->
+                <div class="p-6 bg-bg-light rounded-2xl card-shadow text-center">
+                    <div class="text-4xl text-safe-green mb-4">&#128218;</div>
+                    <h3 class="text-xl font-bold text-gray-900">Play-Based Learning</h3>
+                    <p class="mt-2 text-gray-600">
+                        Children explore concepts through hands-on activities and imaginative play, making education enjoyable.
+                    </p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="p-6 bg-bg-light rounded-2xl card-shadow text-center">
+                    <div class="text-4xl text-primary-blue mb-4">&#128170;</div>
+                    <h3 class="text-xl font-bold text-gray-900">Social-Emotional Growth</h3>
+                    <p class="mt-2 text-gray-600">
+                        Focuses on empathy, sharing, and communication skills to build strong social foundations.
+                    </p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="p-6 bg-bg-light rounded-2xl card-shadow text-center">
+                    <div class="text-4xl text-accent-yellow mb-4">&#128218;</div>
+                    <h3 class="text-xl font-bold text-gray-900">Individualized Attention</h3>
+                    <p class="mt-2 text-gray-600">
+                        Small class sizes ensure every child receives the personalized guidance they need to thrive.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Programs/Curriculum Section -->
+    <section id="programs" class="py-16 sm:py-24 bg-primary-blue bg-opacity-5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Our <span class="text-primary-blue">Programs</span></h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+                    We offer flexible programs designed for various age groups and developmental stages.
+                </p>
+            </div>
+
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Program 1 -->
+                <div class="bg-white p-6 rounded-2xl card-shadow border-t-4 border-safe-green">
+                    <h3 class="text-2xl font-bold text-safe-green">Toddler Discovery (2-3 Yrs)</h3>
+                    <p class="mt-3 text-gray-600">
+                        Focuses on sensory exploration, basic language, and motor skill development in a supportive environment.
+                    </p>
+                    <ul class="mt-4 space-y-2 text-sm text-gray-700 list-inside">
+                        <li>&#x2714; Sensory Bins & Music</li>
+                        <li>&#x2714; Basic Routine Building</li>
+                    </ul>
+                </div>
+                <!-- Program 2 -->
+                <div class="bg-white p-6 rounded-2xl card-shadow border-t-4 border-primary-blue">
+                    <h3 class="text-2xl font-bold text-primary-blue">Pre-K Readiness (3-4 Yrs)</h3>
+                    <p class="mt-3 text-gray-600">
+                        Introducing letters, numbers, and early math concepts through interactive and creative methods.
+                    </p>
+                    <ul class="mt-4 space-y-2 text-sm text-gray-700 list-inside">
+                        <li>&#x2714; Phonics and Storytelling</li>
+                        <li>&#x2714; Group Projects & Art</li>
+                    </ul>
+                </div>
+                <!-- Program 3 -->
+                <div class="bg-white p-6 rounded-2xl card-shadow border-t-4 border-accent-yellow">
+                    <h3 class="text-2xl font-bold text-accent-yellow">Kindergarten Prep (4-5 Yrs)</h3>
+                    <p class="mt-3 text-gray-600">
+                        A comprehensive curriculum ensuring students are fully prepared for elementary school success.
+                    </p>
+                    <ul class="mt-4 space-y-2 text-sm text-gray-700 list-inside">
+                        <li>&#x2714; Early Literacy & Math</li>
+                        <li>&#x2714; Science & Nature Walks</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-16 sm:py-24 bg-primary-blue bg-opacity-5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">What Parents Are Saying</h2>
+            </div>
+            <div class="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="p-6 bg-bg-light rounded-2xl border-l-4 border-accent-yellow italic text-gray-700 shadow-md">
+                    "Since starting at PSIS VH, my son has become more confident and excited about learning. The teachers are fantastic!"
+                    <p class="mt-4 font-semibold text-gray-900 text-sm">- Sarah K., Proud Parent</p>
+                </div>
+                <!-- Testimonial 2 -->
+                <div class="p-6 bg-bg-light rounded-2xl border-l-4 border-safe-green italic text-gray-700 shadow-md">
+                    "The focus on emotional intelligence is what sold us. Our daughter is thriving socially and academically at PSIS VH. Highly recommend!"
+                    <p class="mt-4 font-semibold text-gray-900 text-sm">- David L., Happy Dad</p>
+                </div>
+                <!-- Testimonial 3 -->
+                <div class="p-6 bg-bg-light rounded-2xl border-l-4 border-primary-blue italic text-gray-700 shadow-md">
+                    "The school environment feels safe, warm, and truly nurturing. It's the perfect 'home away from home' for our little one."
+                    <p class="mt-4 font-semibold text-gray-900 text-sm">- Maria P., Enthusiastic Mom</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact & Call to Action Section -->
+    <section id="contact" class="py-16 sm:py-24 bg-primary-blue text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl sm:text-5xl font-extrabold">Ready to Join the PSIS VH Family?</h2>
+            <p class="mt-4 text-xl opacity-90 max-w-3xl mx-auto">
+                Spaces are limited! Contact us today to learn more about our enrollment process and book a personal visit.
+            </p>
+
+            <!-- Contact Buttons (Call and Telegram only) -->
+            <div class="mt-8 flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+                <!-- Call Button -->
+                <a href="tel:093815888" class="w-full sm:w-auto flex-grow sm:flex-grow-0 flex items-center justify-center bg-safe-green text-white py-3 px-6 text-lg font-semibold rounded-full hover:bg-emerald-600 transition duration-300 transform hover:scale-105 shadow-xl">
+                    Call Us: 093 815 888
+                </a>
+                
+                <!-- SINGLE TELEGRAM BUTTON (Triggers Modal) -->
+                <button onclick="openModal()" class="w-full sm:w-auto flex-grow sm:flex-grow-0 flex items-center justify-center bg-accent-yellow text-primary-blue py-3 px-6 text-lg font-semibold rounded-full hover:bg-yellow-300 transition duration-300 transform hover:scale-105 shadow-xl">
+                    <span class="text-xl mr-2">&#9992;</span> Chat on Telegram
+                </button>
+            </div>
+
+            <!-- Map Iframe -->
+            <div class="mt-10 w-full max-w-4xl mx-auto rounded-xl overflow-hidden card-shadow">
+                <iframe
+                    title="School Location Map"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d244.3242244258511!2d104.96633803042894!3d11.53839712576425!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x310957549011fa67%3A0x71ead2bce1b8b026!2zPaFqw7FzYfEgnzEm3N0cmEgSW50ZXJuYXRpb25hbCBTY2hvb2wgLSBWYW4gSG9uZw!5e0!3m2!1sen!2skh!4v1760922073785!5m2!1sen!2skh"
+                    width="100%"
+                    height="300"
+                    frameborder="0"
+                    style="border:0;"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+            
+            <!-- Directions Button -->
+            <a href="https://maps.app.goo.gl/ZPzMsm9VEwvoVb8V8" target="_blank" class="mt-6 inline-block bg-safe-green text-white py-3 px-8 text-lg font-semibold rounded-full hover:bg-emerald-600 transition duration-300 transform hover:scale-105 shadow-xl">
+                <span class="text-xl mr-2">&#128205;</span> Get Directions on Google Maps
+            </a>
+
+
+            <!-- Updated Address -->
+            <div class="mt-8 text-center text-sm opacity-80">
+                <p class="font-bold mb-1">Main Campus Address:</p>
+                <p>Building 582, National Road 1, Phum Kdai Takoy, Sangkat Veal Sbov, Khan Chbar Ampov, Phnom Penh</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- --- FACEBOOK MESSENGER CUSTOMER CHAT PLUGIN START --- -->
+    <div class="fb-customerchat"
+      page_id="PannasastraInternationalSchoolVANHONG.psisvh"
+      greeting_dialog_display="fade"
+      logged_in_greeting="Welcome back! How can we help your child today?"
+      logged_out_greeting="Hi there! Ask us about programs, enrollment, or tours.">
+    </div>
+
+    <!-- Footer (Updated Name) -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-sm flex-col sm:flex-row">
+            <p>&copy; 2025 Paññāsāstra International School - Van Hong (PSIS VH). All Rights Reserved.</p>
+            <div class="mt-3 sm:mt-0 space-x-4">
+                <a href="#" class="hover:text-accent-yellow transition duration-150">Privacy Policy</a>
+                <span class="text-gray-600">|</span>
+                <a href="#" class="hover:text-accent-yellow transition duration-150">Sitemap</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts (Facebook SDK, Modal, and Firebase Setup) -->
+    <script type="module">
+        // --- Firebase Setup ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Global variables provided by the environment
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- Core Modal Logic ---
+        window.openModal = () => {
+            document.getElementById('telegram-modal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        };
+
+        window.closeModal = () => {
+            document.getElementById('telegram-modal').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        };
         
-        // Removed the old window.onload function that was causing conflicts.
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto-Scroll to the contact section on load
+            const targetElement = document.getElementById('contact');
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            // Firebase init for auth/API proxy setup
+            if (firebaseConfig) {
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+                
+                if (initialAuthToken) {
+                    signInWithCustomToken(auth, initialAuthToken).catch(err => {
+                        console.error("Firebase custom token sign-in failed:", err);
+                        signInAnonymously(auth).catch(anonErr => console.error("Anonymous sign-in failed:", anonErr));
+                    });
+                } else {
+                    signInAnonymously(auth).catch(anonErr => console.error("Anonymous sign-in failed:", anonErr));
+                }
+            }
+        });
+    </script>
+    <script>
+        // Facebook SDK script (standard)
+        window.fbAsyncInit = function() {
+            FB.init({
+                xfbml            : true,
+                version          : 'v20.0'
+            });
+        };
+
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js';
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
     </script>
 </body>
 </html>
