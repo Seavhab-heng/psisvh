@@ -102,8 +102,6 @@
             <nav class="flex space-x-4 text-sm font-medium">
                 <a href="#about" class="text-gray-600 hover:text-primary-blue transition duration-150 p-2 rounded-lg">About</a>
                 <a href="#programs" class="text-gray-600 hover:text-primary-blue transition duration-150 p-2 rounded-lg">Programs</a>
-                <!-- Added link for the new tool section -->
-                <a href="#admin-tool" class="text-gray-600 hover:text-primary-blue transition duration-150 p-2 rounded-lg hidden sm:block">Admin Tool</a> 
                 <a href="#contact" class="hidden sm:inline-block bg-primary-blue text-white py-2 px-4 rounded-full hover:bg-indigo-700 transition duration-150 shadow-md">Enroll Now</a>
             </nav>
         </div>
@@ -151,7 +149,6 @@
                             <!-- Arms Waving -->
                             <path d="M30 65 Q15 75, 20 85" stroke="#FFEAA7" stroke-width="6" stroke-linecap="round"/>
                             <path d="M70 65 Q85 75, 80 85" stroke="#FFEAA7" stroke-width="6" stroke-linecap="round"/>
-                            <!-- Note: Removed the Apple decoration here -->
                         </svg>
                     </div>
                 </div>
@@ -260,54 +257,6 @@
         </div>
     </section>
 
-    <!-- NEW: Gemini-Powered Announcement Draft Tool Section -->
-    <section id="admin-tool" class="py-16 sm:py-24 bg-white">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">
-                    <span class="text-primary-blue">School Announcement Draft Tool</span> ✨
-                </h2>
-                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-                    Use the power of AI to instantly generate professional, friendly announcements for parents and staff.
-                </p>
-            </div>
-
-            <div class="mt-10 p-8 bg-bg-light rounded-2xl card-shadow border-t-4 border-primary-blue">
-                <div class="space-y-6">
-                    <!-- Input 1: Topic/Key Points -->
-                    <div>
-                        <label for="announcement-topic" class="block text-lg font-medium text-gray-700 mb-2">1. Key Points/Topic:</label>
-                        <textarea id="announcement-topic" rows="4" placeholder="e.g., School closure tomorrow due to bad weather. All classes moved online. Teachers will email instructions by 8am." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary-blue focus:border-primary-blue transition-shadow shadow-inner"></textarea>
-                    </div>
-
-                    <!-- Input 2: Tone/Audience -->
-                    <div>
-                        <label for="announcement-tone" class="block text-lg font-medium text-gray-700 mb-2">2. Desired Audience & Tone:</label>
-                        <select id="announcement-tone" class="w-full p-3 border border-gray-300 rounded-lg bg-white shadow-inner focus:ring-primary-blue focus:border-primary-blue transition">
-                            <option value="Warm and Formal (Parents)">Warm and Formal (Parents - Official Email)</option>
-                            <option value="Enthusiastic and Cheerful (Students)">Enthusiastic and Cheerful (Students - Assembly)</option>
-                            <option value="Concise and Professional (Staff)">Concise and Professional (Staff - Memo)</option>
-                            <option value="Urgent and Clear (Emergency)">Urgent and Clear (Emergency - SMS Alert)</option>
-                        </select>
-                    </div>
-
-                    <!-- Generate Button -->
-                    <button id="generate-announcement-btn" class="w-full bg-safe-green text-white py-3 px-6 text-lg font-semibold rounded-full hover:bg-emerald-600 transition duration-300 transform hover:scale-[1.01] shadow-xl">
-                        Draft Announcement ✨
-                    </button>
-                </div>
-                
-                <!-- Output Area -->
-                <div id="announcement-output" class="mt-8">
-                    <div class="p-4 text-center text-gray-500 bg-gray-50 rounded-xl border border-gray-200">
-                        Your generated announcement draft will appear here.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
     <!-- Testimonials Section -->
     <section class="py-16 sm:py-24 bg-primary-blue bg-opacity-5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -355,7 +304,7 @@
                 </button>
             </div>
 
-            <!-- Map Iframe - UPDATED WITH USER'S SPECIFIC EMBED SRC -->
+            <!-- Map Iframe -->
             <div class="mt-10 w-full max-w-4xl mx-auto rounded-xl overflow-hidden card-shadow">
                 <iframe
                     title="School Location Map"
@@ -404,105 +353,17 @@
         </div>
     </footer>
 
-    <!-- Scripts (Facebook SDK, Modal, LLM Logic, and Firebase Setup) -->
+    <!-- Scripts (Facebook SDK, Modal, and Firebase Setup) -->
     <script type="module">
-        // --- Firebase/LLM Setup (REQUIRED FOR API CALLS) ---
+        // --- Firebase Setup ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        // Firestore is not used, so only Auth/App imports are needed
 
         // Global variables provided by the environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        let auth; 
-        const GEMINI_MODEL = "gemini-2.5-flash-preview-09-2025";
-        const API_KEY = ""; // Use empty string for automatic handling
-
-        // Exponential Backoff function for API robustness
-        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-        async function fetchWithRetry(url, options, retries = 3) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (!response.ok) {
-                        if (response.status === 429 || response.status >= 500) {
-                            throw new Error(`Server error: ${response.status}`);
-                        }
-                        throw new Error(`Client error: ${response.status}`);
-                    }
-                    return response;
-                } catch (error) {
-                    if (i < retries - 1) {
-                        const waitTime = Math.pow(2, i) * 1000;
-                        await delay(waitTime);
-                    } else {
-                        throw error;
-                    }
-                }
-            }
-        }
-
-        // Function to call Gemini API for announcement generation
-        async function generateAnnouncement(topic, tone) {
-            const generateButton = document.getElementById('generate-announcement-btn');
-            const outputDiv = document.getElementById('announcement-output');
-            
-            // Disable button and show loading indicator
-            generateButton.disabled = true;
-            generateButton.innerHTML = '<svg class="animate-spin h-5 w-5 mr-3 inline text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Drafting...';
-
-            outputDiv.innerHTML = '<div class="text-center p-4 text-primary-blue bg-blue-50 rounded-xl">Drafting announcement, please wait...</div>';
-
-            const systemPrompt = `You are a helpful and professional school administrator for Paññāsāstra International School. Your task is to draft a clear, concise, and friendly school announcement based on the user's key points. The tone should be ${tone}. Use a formal but warm voice and end the announcement with 'Thank you for your cooperation and support. PSIS VH Administration.'`;
-
-            const userQuery = `Draft an announcement for the school based on the following key points: "${topic}". The target audience/tone is ${tone}. Please make the key dates/times **bold**.`;
-
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${API_KEY}`;
-            
-            const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                systemInstruction: {
-                    parts: [{ text: systemPrompt }]
-                },
-            };
-
-            try {
-                const response = await fetchWithRetry(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const result = await response.json();
-                const generatedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                
-                if (generatedText) {
-                    // Simple markdown text to HTML paragraph conversion (handling bolding from LLM response)
-                    const formattedText = generatedText.split('\n').map(p => {
-                        if (p.trim() === '') return '';
-                        // Replace markdown **bold** with <strong>
-                        const cleanP = p.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                        return `<p class="mb-3">${cleanP}</p>`;
-                    }).join('');
-                    
-                    outputDiv.innerHTML = `<div class="p-6 bg-green-50 rounded-xl border border-safe-green text-gray-800">${formattedText}</div>`;
-                } else {
-                    outputDiv.innerHTML = '<div class="p-4 bg-red-100 rounded-xl text-red-700">Sorry, I couldn\'t generate the announcement. Please try again with more details.</div>';
-                }
-                
-            } catch (error) {
-                console.error('Gemini API Error:', error);
-                outputDiv.innerHTML = '<div class="p-4 bg-red-100 rounded-xl text-red-700">An error occurred while connecting to the drafting service. Please check your network.</div>';
-            } finally {
-                generateButton.disabled = false;
-                generateButton.innerHTML = 'Draft Announcement ✨';
-            }
-        }
-
-        // --- Core Application Logic ---
+        // --- Core Modal Logic ---
         window.openModal = () => {
             document.getElementById('telegram-modal').classList.remove('hidden');
             document.body.classList.add('overflow-hidden');
@@ -514,32 +375,16 @@
         };
         
         document.addEventListener('DOMContentLoaded', () => {
-            // Auto-Scroll to the contact section on load (existing feature)
+            // Auto-Scroll to the contact section on load
             const targetElement = document.getElementById('contact');
             if (targetElement) {
                 targetElement.scrollIntoView({ behavior: 'smooth' });
             }
 
-            // New event listener for the LLM tool
-            const generateButton = document.getElementById('generate-announcement-btn');
-            if (generateButton) {
-                generateButton.addEventListener('click', () => {
-                    const topic = document.getElementById('announcement-topic').value.trim();
-                    const tone = document.getElementById('announcement-tone').value;
-
-                    if (topic.length < 10) {
-                        document.getElementById('announcement-output').innerHTML = '<div class="p-4 bg-yellow-100 rounded-xl text-yellow-800">Please provide at least 10 characters for the announcement topic.</div>';
-                        return;
-                    }
-
-                    generateAnnouncement(topic, tone);
-                });
-            }
-
-            // Firebase init for API proxy authentication
+            // Firebase init for auth/API proxy setup
             if (firebaseConfig) {
                 const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
+                const auth = getAuth(app);
                 
                 if (initialAuthToken) {
                     signInWithCustomToken(auth, initialAuthToken).catch(err => {
