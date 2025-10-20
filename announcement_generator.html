@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI School Announcement Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .container {
+            max-width: 900px;
+            padding: 1rem;
+        }
+        .card {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #10b981;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Mobile adjustments */
+        @media (max-width: 640px) {
+            .card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto mt-8 md:mt-12">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-gray-800">School Communication AI</h1>
+            <p class="text-gray-500 mt-2">Instantly draft announcements for any school event.</p>
+        </header>
+
+        <div class="card grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Input Form -->
+            <div class="space-y-6">
+                <h2 class="text-2xl font-semibold text-gray-700 border-b pb-3 mb-4">Drafting Parameters</h2>
+
+                <div>
+                    <label for="topic" class="block text-sm font-medium text-gray-700 mb-1">1. Announcement Topic / Event</label>
+                    <input type="text" id="topic" value="Upcoming School Book Fair" placeholder="e.g., Parent-Teacher Interviews, School Closure, Field Trip" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150">
+                </div>
+
+                <div>
+                    <label for="details" class="block text-sm font-medium text-gray-700 mb-1">2. Key Details & Instructions</label>
+                    <textarea id="details" rows="4" placeholder="Date: Oct 28 - Nov 1. Location: School Library. Need volunteers. Books starting at $1." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150">Date: Tuesday, Nov 5th to Friday, Nov 8th. Location: School Library. Hours: 3:00 PM - 5:00 PM. All proceeds go to new playground equipment. Parents can pre-order online.</textarea>
+                    <p class="text-xs text-gray-500 mt-1">Include all crucial information here (dates, times, actions needed).</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="audience" class="block text-sm font-medium text-gray-700 mb-1">3. Audience</label>
+                        <select id="audience" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 appearance-none">
+                            <option value="Parents and Guardians" selected>Parents & Guardians</option>
+                            <option value="School Staff and Faculty">School Staff & Faculty</option>
+                            <option value="Students">Students (Age-appropriate)</option>
+                            <option value="Community Members">Community Members</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="tone" class="block text-sm font-medium text-gray-700 mb-1">4. Desired Tone</label>
+                        <select id="tone" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 appearance-none">
+                            <option value="Friendly and Warm" selected>Friendly and Warm</option>
+                            <option value="Formal and Professional">Formal and Professional</option>
+                            <option value="Urgent and Action-Oriented">Urgent and Action-Oriented</option>
+                            <option value="Encouraging and Enthusiastic">Encouraging and Enthusiastic</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Removed onclick="handleGenerateClick()" -->
+                <button id="generateBtn" class="w-full bg-emerald-600 text-white font-semibold py-3 rounded-lg hover:bg-emerald-700 transition duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg">
+                    <span id="buttonText">Generate Announcement</span>
+                    <div id="loadingSpinner" class="hidden loading-spinner"></div>
+                </button>
+                <div id="errorBox" class="text-red-600 bg-red-100 p-3 rounded-lg hidden" role="alert"></div>
+            </div>
+
+            <!-- Output Display -->
+            <div class="lg:border-l lg:pl-8">
+                <h2 class="text-2xl font-semibold text-gray-700 border-b pb-3 mb-4">Drafted Announcement</h2>
+                <div id="outputContainer" class="min-h-[250px] bg-gray-50 p-4 border border-gray-200 rounded-lg whitespace-pre-wrap text-gray-800 leading-relaxed text-sm">
+                    Your drafted announcement will appear here after clicking 'Generate Announcement'.
+                </div>
+                <div id="sourcesContainer" class="mt-4 pt-4 border-t border-gray-200 text-xs text-gray-500 hidden">
+                    <p class="font-medium mb-1">Sources Used (for grounding factual information):</p>
+                    <ul id="sourcesList" class="list-disc ml-4 space-y-1"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // API Configuration (Mandatory global variables)
+        const apiKey = ""; // Leave as-is, Canvas will provide key at runtime
+        const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=" + apiKey;
+
+        const button = document.getElementById('generateBtn');
+        const buttonText = document.getElementById('buttonText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const outputContainer = document.getElementById('outputContainer');
+        const errorBox = document.getElementById('errorBox');
+        const sourcesContainer = document.getElementById('sourcesContainer');
+        const sourcesList = document.getElementById('sourcesList');
+        
+        // Utility function for exponential backoff
+        const MAX_RETRIES = 5;
+        const INITIAL_DELAY_MS = 1000;
+
+        async function fetchWithBackoff(url, options) {
+            for (let i = 0; i < MAX_RETRIES; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) {
+                        return response;
+                    }
+                    if (response.status === 429 || response.status >= 500) {
+                        // Rate limit or server error, try again
+                        const delay = INITIAL_DELAY_MS * Math.pow(2, i) + Math.random() * 1000;
+                        // Template literal removed
+                        console.warn('API request failed with status ' + response.status + '. Retrying in ' + (delay / 1000).toFixed(1) + 's...');
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        continue;
+                    }
+                    // Non-retriable error
+                    const errorJson = await response.json();
+                    // Template literal removed
+                    throw new Error('API request failed: ' + response.status + ' - ' + (errorJson.error.message || response.statusText));
+                } catch (error) {
+                    if (i === MAX_RETRIES - 1) {
+                        throw error;
+                    }
+                    // Handle network errors before retrying
+                    const delay = INITIAL_DELAY_MS * Math.pow(2, i) + Math.random() * 1000;
+                    // Template literal removed
+                    console.warn('Network error on API call. Retrying in ' + (delay / 1000).toFixed(1) + 's...');
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
+
+        function toggleLoading(isLoading) {
+            button.disabled = isLoading;
+            loadingSpinner.classList.toggle('hidden', !isLoading);
+            buttonText.textContent = isLoading ? 'Drafting...' : 'Generate Announcement';
+            errorBox.classList.add('hidden');
+        }
+
+        function displayError(message) {
+            // Template literal removed
+            errorBox.textContent = 'Error: ' + message;
+            errorBox.classList.remove('hidden');
+            outputContainer.textContent = "Could not generate announcement. Please check your inputs and try again.";
+        }
+        
+        function extractSources(candidate) {
+            const sources = [];
+            const groundingMetadata = candidate.groundingMetadata;
+            if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                groundingMetadata.groundingAttributions.forEach(attribution => {
+                    if (attribution.web?.uri && attribution.web?.title) {
+                        sources.push({
+                            uri: attribution.web.uri,
+                            title: attribution.web.title
+                        });
+                    }
+                });
+            }
+            return sources;
+        }
+
+        // Changed from window.handleGenerateClick to module-scoped function
+        async function handleGenerateClick() {
+            toggleLoading(true);
+            outputContainer.textContent = "Drafting the perfect announcement...";
+            sourcesContainer.classList.add('hidden');
+            sourcesList.innerHTML = '';
+
+            const topic = document.getElementById('topic').value.trim();
+            const details = document.getElementById('details').value.trim();
+            const audience = document.getElementById('audience').value;
+            const tone = document.getElementById('tone').value;
+
+            if (!topic || !details) {
+                toggleLoading(false);
+                displayError("Please provide both a Topic and Key Details to draft the announcement.");
+                return;
+            }
+
+            try {
+                // 1. Define the LLM's role and tone (System Instruction) - Template literal removed
+                const systemPrompt = 'You are a professional school communication specialist. Your tone must be strictly ' + tone + '. The primary audience is ' + audience + '. Structure the output with a bold title, a clear introductory statement, and well-formatted key information points. Do not include any introductory or concluding conversational text, only the announcement itself.';
+
+                // 2. Define the user's specific task (User Query) - Template literal removed
+                const userQuery = 'Please draft the full announcement about the following event/topic: "' + topic + '". The essential details and instructions that must be included are: "' + details + '".';
+
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    
+                    // Enable Google Search grounding for real-time information access
+                    tools: [{ "google_search": {} }],
+                    
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                };
+
+                const response = await fetchWithBackoff(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    const generatedText = candidate.content.parts[0].text;
+                    outputContainer.textContent = generatedText;
+
+                    // Extract and display sources if available
+                    const sources = extractSources(candidate);
+                    if (sources.length > 0) {
+                        sources.forEach(source => {
+                            const li = document.createElement('li');
+                            const a = document.createElement('a');
+                            a.href = source.uri;
+                            a.target = "_blank";
+                            a.rel = "noopener noreferrer";
+                            a.textContent = source.title || source.uri;
+                            a.className = "text-blue-600 hover:text-blue-800 underline";
+                            li.appendChild(a);
+                            sourcesList.appendChild(li);
+                        });
+                        sourcesContainer.classList.remove('hidden');
+                    }
+                } else {
+                    displayError("The drafting service returned an unexpected or empty response.");
+                    console.error("API Response Error:", result);
+                }
+
+            } catch (error) {
+                displayError(error.message || "A network error occurred while reaching the AI service.");
+                console.error("Fetch Error:", error);
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        // Setup event listeners and initial run inside DOMContentLoaded for module compatibility
+        document.addEventListener('DOMContentLoaded', () => {
+            const generateButton = document.getElementById('generateBtn');
+            if (generateButton) {
+                generateButton.addEventListener('click', handleGenerateClick);
+            }
+            
+            // Auto-run the initial generation (from the original window.onload)
+            setTimeout(handleGenerateClick, 50); 
+        });
+        
+        // Removed the old window.onload function that was causing conflicts.
+    </script>
+</body>
+</html>
