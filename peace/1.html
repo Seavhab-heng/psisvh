@@ -38,12 +38,15 @@
             background: #ffffff;
             touch-action: none;
             border-radius: 12px;
+            /* Stabilization fix for mobile capture */
+            transform: translateZ(0);
         }
         #uploadedImage {
             position: absolute;
             top: 0; left: 0;
             transform-origin: center center;
             cursor: move;
+            will-change: transform;
         }
         #frameOverlay {
             position: absolute;
@@ -52,7 +55,6 @@
             pointer-events: none;
             z-index: 10;
         }
-        .svg-bg { background: linear-gradient(135deg, #FFD700 0%, #FFA07A 100%); }
     </style>
 </head>
 <body class="font-sans bg-bg-light text-gray-800">
@@ -110,7 +112,6 @@
     <section id="campaign-frame-tool" class="py-20 bg-gray-50 px-4">
         <div class="max-w-lg mx-auto bg-white rounded-3xl shadow-2xl border-4 border-accent-yellow p-6 sm:p-10">
             <h2 class="text-2xl font-black text-center text-primary-blue mb-2 uppercase">Profile Frame</h2>
-            <p class="text-center text-xs text-gray-400 mb-6 font-bold uppercase tracking-widest">Support our Campaign</p>
             
             <div class="frame-container border shadow-inner" id="canvasContainer">
                 <img id="uploadedImage" draggable="false" src="" />
@@ -135,9 +136,9 @@
 
     <section id="about" class="py-16 text-center px-4">
         <p class="font-bold text-primary-blue uppercase tracking-widest text-sm mb-2">Main Campus</p>
-        <p class="text-gray-600 max-w-xl mx-auto mb-10">Building 582, National Road 1, Phum Kdai Takoy, Sangkat Veal Sbov, Chbar Ampov, Phnom Penh</p>
+        <p class="text-gray-600 max-w-xl mx-auto mb-10">Building 582, National Road 1, Chbar Ampov, Phnom Penh</p>
         <div class="max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-xl h-64 bg-gray-200">
-            <iframe src="http://googleusercontent.com/maps.google.com/4" width="100%" height="100%" style="border:0;" loading="lazy"></iframe>
+            <iframe src="http://googleusercontent.com/maps.google.com/5" width="100%" height="100%" style="border:0;" loading="lazy"></iframe>
         </div>
     </section>
 
@@ -146,27 +147,21 @@
     </footer>
 
     <script>
-        // 1. MODAL
+        // MODAL LOGIC
         window.openModal = () => document.getElementById('telegram-modal').classList.remove('hidden');
         window.closeModal = () => document.getElementById('telegram-modal').classList.add('hidden');
 
-        // 2. AUTO-SCROLL
+        // AUTO-SCROLL
         window.addEventListener('load', () => {
             const target = document.getElementById('campaign-frame-tool');
             if (target) {
                 setTimeout(() => {
                     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 1000);
+                }, 1200);
             }
         });
 
-        // 3. SHARE LINKS
-        const pageUrl = encodeURIComponent(window.location.href);
-        document.getElementById('shareTg').href = `https://t.me/share/url?url=${pageUrl}`;
-        document.getElementById('shareWa').href = `https://wa.me/?text=${pageUrl}`;
-        document.getElementById('shareFb').href = `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`;
-
-        // 4. FRAME TOOL + PHP DOWNLOAD LOGIC
+        // FRAME TOOL VARIABLES
         const uploadedImage = document.getElementById('uploadedImage');
         const canvasContainer = document.getElementById('canvasContainer');
         const uploadInput = document.getElementById('uploadInput');
@@ -183,12 +178,11 @@
         function resetFrame() { scale = 1; translateX = 0; translateY = 0; updateTransform(); }
         function updateTransform() { uploadedImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`; }
 
-        // Interaction (Drag/Zoom)
+        // Interaction
         canvasContainer.addEventListener('mousedown', (e) => { isDragging = true; startX = e.clientX - translateX; startY = e.clientY - translateY; });
         window.addEventListener('mousemove', (e) => { if (isDragging) { translateX = e.clientX - startX; translateY = e.clientY - startY; updateTransform(); } });
         window.addEventListener('mouseup', () => isDragging = false);
 
-        // Mobile Touch Zoom/Drag
         canvasContainer.addEventListener('touchstart', (e) => {
             if (e.touches.length === 1) {
                 isDragging = true; startX = e.touches[0].clientX - translateX; startY = e.touches[0].clientY - translateY;
@@ -208,17 +202,26 @@
             updateTransform();
         }, { passive: false });
 
-        // PHP DOWNLOAD FIX FOR FACEBOOK/TELEGRAM
+        // DOWNLOAD FIX FOR FACEBOOK/TELEGRAM + PANNING FIX
         downloadBtn.addEventListener('click', () => {
             if (!uploadedImage.src) return alert("Please upload a photo first!");
             
             downloadBtn.innerText = "Processing...";
             downloadBtn.disabled = true;
 
-            html2canvas(canvasContainer, { useCORS: true, scale: 2 }).then(canvas => {
+            const rect = canvasContainer.getBoundingClientRect();
+
+            html2canvas(canvasContainer, { 
+                useCORS: true, 
+                scale: 2,
+                width: rect.width,
+                height: rect.height,
+                scrollX: 0,
+                scrollY: -window.scrollY, // Fixed panning/offset issue
+                backgroundColor: null
+            }).then(canvas => {
                 const base64Image = canvas.toDataURL("image/png");
 
-                // UPLOAD TO PHP HOSTING (xau.news)
                 fetch('https://xau.news/psisvh/upload.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -227,19 +230,24 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        // Redirect to the direct physical image URL
                         window.location.href = data.url;
                     } else {
                         alert("Error: " + data.message);
                     }
                 })
-                .catch(err => alert("Connection error to server."))
+                .catch(err => alert("Connection error to storage server."))
                 .finally(() => {
                     downloadBtn.innerText = "Download & Save";
                     downloadBtn.disabled = false;
                 });
             });
         });
+
+        // Share links
+        const pageUrl = encodeURIComponent(window.location.href);
+        document.getElementById('shareTg').href = `https://t.me/share/url?url=${pageUrl}`;
+        document.getElementById('shareWa').href = `https://wa.me/?text=${pageUrl}`;
+        document.getElementById('shareFb').href = `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`;
     </script>
 </body>
 </html>
