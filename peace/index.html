@@ -1,200 +1,112 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Thailand Attacks First, Cambodia Defend</title>
-  <meta name="description" content="Support our campaign Thailand Attacks First, Cambodia Defend by adding this frame to your profile photo.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+  const uploadInput = document.getElementById('uploadInput');
+  const uploadedImage = document.getElementById('uploadedImage');
+  const canvasContainer = document.getElementById('canvasContainer');
+  const downloadBtn = document.getElementById('downloadBtn');
+
+  let scale = 1, rotation = 0;
+  let isDragging = false;
+  let startX = 0, startY = 0, translateX = 0, translateY = 0;
   
-  <!-- Google Tag Manager -->
-  <script>
-    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-WG5NMMWC');
-  </script>
-  <!-- End Google Tag Manager -->
+  // Touch variables
+  let initialDist = -1;
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      margin: 0;
-      padding: 20px;
-      text-align: center;
-    }
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-    .header img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-    }
-    .frame-container {
-      position: relative;
-      width: 90vw;
-      max-width: 400px;
-      aspect-ratio: 1/1;
-      margin: 20px auto;
-      border: 1px solid #ccc;
-      overflow: hidden;
-      background: #fff;
-      touch-action: none;
-    }
-    #uploadedImage {
-      position: absolute;
-      top: 0;
-      left: 0;
-      user-select: none;
-      max-width: none;
-      transform-origin: center center;
-    }
-    #frameOverlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-    .styles-slider {
-      display: flex;
-      overflow-x: auto;
-      gap: 10px;
-      justify-content: flex-start;
-      margin-top: 20px;
-      padding-bottom: 10px;
-    }
-    .styles-slider a img {
-      width: 70px;
-      height: 70px;
-      object-fit: cover;
-      border: 2px solid #ccc;
-      border-radius: 6px;
-      background: #fff;
-    }
-    button, input[type="file"] {
-      margin-top: 10px;
-      padding: 8px 15px;
-      font-size: 1rem;
-    }
-    .share-buttons {
-      margin-top: 15px;
-    }
-    .share-buttons a {
-      display: inline-block;
-      margin: 0 5px;
-      text-decoration: none;
-      font-size: 1.2rem;
-    }
-  </style>
-</head>
-<body>
-  
-  <h2>My Campaign Frame</h2>
-  <p>Support our campaign by adding this frame to your photo.</p>
-
-  <input type="file" accept="image/*" id="uploadInput" />
-
-  <div class="frame-container" id="canvasContainer">
-    <img id="uploadedImage" draggable="false" />
-    <img id="frameOverlay" src="frame.png" />
-  </div>
-
-  <button id="downloadBtn">Download Image</button>
-
-  <div class="share-buttons">
-    <a href="#" id="shareFb">🔗 Facebook</a>
-    <a href="#" id="shareTw">🔗 Twitter</a>
-    <a href="#" id="shareWa">🔗 WhatsApp</a>
-  </div>
-
-
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script>
-    const uploadInput = document.getElementById('uploadInput');
-    const uploadedImage = document.getElementById('uploadedImage');
-    const canvasContainer = document.getElementById('canvasContainer');
-    const downloadBtn = document.getElementById('downloadBtn');
-
-    let scale = 1, rotation = 0;
-    let isDragging = false;
-    let startX = 0, startY = 0, offsetX = 0, offsetY = 0;
-
-    uploadInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        uploadedImage.src = event.target.result;
-        uploadedImage.style.width = "200%";
-        uploadedImage.style.left = "0px";
-        uploadedImage.style.top = "0px";
-        scale = 1;
-        rotation = 0;
-        updateTransform();
-      };
-      reader.readAsDataURL(file);
-    });
-
-    function updateTransform() {
-      uploadedImage.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
-    }
-
-    canvasContainer.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      scale += e.deltaY * -0.001;
-      scale = Math.min(Math.max(.5, scale), 3);
+  // 1. Handle Upload
+  uploadInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      uploadedImage.src = event.target.result;
+      // Reset positions for new image
+      scale = 1;
+      translateX = 0;
+      translateY = 0;
+      rotation = 0;
       updateTransform();
-    });
+    };
+    reader.readAsDataURL(file);
+  });
 
-    canvasContainer.addEventListener('mousedown', (e) => {
+  function updateTransform() {
+    uploadedImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${rotation}deg)`;
+  }
+
+  // 2. Zoom (Mouse Wheel)
+  canvasContainer.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    scale = Math.min(Math.max(0.1, scale + delta), 5);
+    updateTransform();
+  }, { passive: false });
+
+  // 3. Pan (Mouse Drag)
+  canvasContainer.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    startX = e.clientX - translateX;
+    startY = e.clientY - translateY;
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    translateX = e.clientX - startX;
+    translateY = e.clientY - startY;
+    updateTransform();
+  });
+
+  document.addEventListener('mouseup', () => isDragging = false);
+
+  // 4. Mobile Touch (Pan & Pinch-to-Zoom)
+  canvasContainer.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
       isDragging = true;
-      startX = e.clientX - offsetX;
-      startY = e.clientY - offsetY;
-    });
-    document.addEventListener('mouseup', () => { isDragging = false; });
-    document.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      offsetX = e.clientX - startX;
-      offsetY = e.clientY - startY;
-      uploadedImage.style.left = `${offsetX}px`;
-      uploadedImage.style.top = `${offsetY}px`;
-    });
+      startX = e.touches[0].clientX - translateX;
+      startY = e.touches[0].clientY - translateY;
+    } else if (e.touches.length === 2) {
+      initialDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+    }
+  });
 
-    canvasContainer.addEventListener('dblclick', () => {
-      rotation = (rotation + 90) % 360;
-      updateTransform();
-    });
+  canvasContainer.addEventListener('touchmove', (e) => {
+    e.preventDefault(); // Stop scrolling while adjusting photo
+    if (isDragging && e.touches.length === 1) {
+      translateX = e.touches[0].clientX - startX;
+      translateY = e.touches[0].clientY - startY;
+    } else if (e.touches.length === 2) {
+      const currentDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      if (initialDist > 0) {
+        const zoomFactor = currentDist / initialDist;
+        scale *= zoomFactor;
+        initialDist = currentDist;
+      }
+    }
+    updateTransform();
+  }, { passive: false });
 
-    downloadBtn.addEventListener('click', () => {
-      html2canvas(canvasContainer).then(canvas => {
-        const link = document.createElement('a');
-        link.download = 'twibbon.png';
-        link.href = canvas.toDataURL();
-        link.click();
-      });
-    });
+  canvasContainer.addEventListener('touchend', () => {
+    isDragging = false;
+    initialDist = -1;
+  });
 
-    document.getElementById('shareFb').addEventListener('click', (e) => {
-      e.preventDefault();
-      window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(window.location.href), '_blank');
+  // 5. Download (Crop & Save)
+  downloadBtn.addEventListener('click', () => {
+    // We target the container to "crop" anything outside its borders
+    html2canvas(canvasContainer, {
+      useCORS: true,
+      scale: 2, // High definition
+      backgroundColor: null
+    }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = 'campaign-photo.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
     });
-    document.getElementById('shareTw').addEventListener('click', (e) => {
-      e.preventDefault();
-      window.open('https://twitter.com/intent/tweet?url='+encodeURIComponent(window.location.href), '_blank');
-    });
-    document.getElementById('shareWa').addEventListener('click', (e) => {
-      e.preventDefault();
-      window.open('https://wa.me/?text='+encodeURIComponent(window.location.href), '_blank');
-    });
-  </script>
-</body>
-</html>
+  });
+</script>
