@@ -1,112 +1,180 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script>
-  const uploadInput = document.getElementById('uploadInput');
-  const uploadedImage = document.getElementById('uploadedImage');
-  const canvasContainer = document.getElementById('canvasContainer');
-  const downloadBtn = document.getElementById('downloadBtn');
-
-  let scale = 1, rotation = 0;
-  let isDragging = false;
-  let startX = 0, startY = 0, translateX = 0, translateY = 0;
-  
-  // Touch variables
-  let initialDist = -1;
-
-  // 1. Handle Upload
-  uploadInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      uploadedImage.src = event.target.result;
-      // Reset positions for new image
-      scale = 1;
-      translateX = 0;
-      translateY = 0;
-      rotation = 0;
-      updateTransform();
-    };
-    reader.readAsDataURL(file);
-  });
-
-  function updateTransform() {
-    uploadedImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${rotation}deg)`;
-  }
-
-  // 2. Zoom (Mouse Wheel)
-  canvasContainer.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    scale = Math.min(Math.max(0.1, scale + delta), 5);
-    updateTransform();
-  }, { passive: false });
-
-  // 3. Pan (Mouse Drag)
-  canvasContainer.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    startX = e.clientX - translateX;
-    startY = e.clientY - translateY;
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    translateX = e.clientX - startX;
-    translateY = e.clientY - startY;
-    updateTransform();
-  });
-
-  document.addEventListener('mouseup', () => isDragging = false);
-
-  // 4. Mobile Touch (Pan & Pinch-to-Zoom)
-  canvasContainer.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 1) {
-      isDragging = true;
-      startX = e.touches[0].clientX - translateX;
-      startY = e.touches[0].clientY - translateY;
-    } else if (e.touches.length === 2) {
-      initialDist = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Responsive Campaign Frame</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f4f4f9;
+      margin: 0;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-  });
 
-  canvasContainer.addEventListener('touchmove', (e) => {
-    e.preventDefault(); // Stop scrolling while adjusting photo
-    if (isDragging && e.touches.length === 1) {
-      translateX = e.touches[0].clientX - startX;
-      translateY = e.touches[0].clientY - startY;
-    } else if (e.touches.length === 2) {
-      const currentDist = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
-      if (initialDist > 0) {
-        const zoomFactor = currentDist / initialDist;
-        scale *= zoomFactor;
-        initialDist = currentDist;
-      }
+    .frame-container {
+      position: relative;
+      width: 90vw;
+      max-width: 450px;
+      aspect-ratio: 1/1;
+      background: #fff;
+      border: 3px solid #000;
+      overflow: hidden;
+      touch-action: none; /* Crucial for mobile panning */
+      margin-bottom: 20px;
     }
-    updateTransform();
-  }, { passive: false });
 
-  canvasContainer.addEventListener('touchend', () => {
-    isDragging = false;
-    initialDist = -1;
-  });
+    #uploadedImage {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: center center;
+      cursor: move;
+    }
 
-  // 5. Download (Crop & Save)
-  downloadBtn.addEventListener('click', () => {
-    // We target the container to "crop" anything outside its borders
-    html2canvas(canvasContainer, {
-      useCORS: true,
-      scale: 2, // High definition
-      backgroundColor: null
-    }).then(canvas => {
-      const link = document.createElement('a');
-      link.download = 'campaign-photo.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+    #frameOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .controls {
+      width: 90vw;
+      max-width: 450px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    button {
+      padding: 15px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn-download { background: #28a745; color: white; }
+    .btn-reset { background: #dc3545; color: white; }
+    
+    input[type="file"] { margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+  <h2>Campaign Photo Creator</h2>
+  <p>1. Upload 2. Pinch/Drag 3. Download</p>
+
+  <div class="frame-container" id="canvasContainer">
+    <img id="uploadedImage" draggable="false" />
+    <img id="frameOverlay" src="frame.png" alt="Overlay Frame (Make sure frame.png exists!)" />
+  </div>
+
+  <div class="controls">
+    <input type="file" accept="image/*" id="uploadInput" />
+    <button class="btn-download" id="downloadBtn">Download Photo</button>
+    <button class="btn-reset" id="resetBtn">Reset Image</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    const uploadedImage = document.getElementById('uploadedImage');
+    const canvasContainer = document.getElementById('canvasContainer');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    let scale = 1, translateX = 0, translateY = 0, isDragging = false, startX = 0, startY = 0;
+    let initialDist = -1;
+
+    // Handle Upload
+    document.getElementById('uploadInput').addEventListener('change', function(e) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        uploadedImage.src = event.target.result;
+        resetPosition();
+      };
+      reader.readAsDataURL(e.target.files[0]);
     });
-  });
-</script>
+
+    function resetPosition() {
+      scale = 1; translateX = 0; translateY = 0;
+      updateTransform();
+    }
+
+    function updateTransform() {
+      uploadedImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    }
+
+    // --- MOUSE DRAG ---
+    canvasContainer.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX - translateX;
+      startY = e.clientY - translateY;
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      translateX = e.clientX - startX;
+      translateY = e.clientY - startY;
+      updateTransform();
+    });
+    window.addEventListener('mouseup', () => isDragging = false);
+
+    // --- TOUCH PAN & ZOOM ---
+    canvasContainer.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        startX = e.touches[0].clientX - translateX;
+        startY = e.touches[0].clientY - translateY;
+      } else if (e.touches.length === 2) {
+        initialDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      }
+    }, { passive: false });
+
+    canvasContainer.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (isDragging && e.touches.length === 1) {
+        translateX = e.touches[0].clientX - startX;
+        translateY = e.touches[0].clientY - startY;
+      } else if (e.touches.length === 2) {
+        let dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        scale *= (dist / initialDist);
+        initialDist = dist;
+      }
+      updateTransform();
+    }, { passive: false });
+
+    canvasContainer.addEventListener('touchend', () => {
+      isDragging = false;
+      initialDist = -1;
+    });
+
+    // --- DOWNLOAD ---
+    downloadBtn.addEventListener('click', () => {
+      if (!uploadedImage.src) return alert("Upload a photo first!");
+      
+      html2canvas(canvasContainer, {
+        useCORS: true, 
+        allowTaint: true,
+        scale: 2 // High resolution
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'campaign_photo.png';
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }).catch(err => {
+        alert("Error generating image. Try using a different browser or checking if frame.png is correct.");
+      });
+    });
+
+    resetBtn.onclick = resetPosition;
+  </script>
+</body>
+</html>
