@@ -3,9 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="https://psisvh.vercel.app/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://psisvh.vercel.app/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://psisvh.vercel.app/favicon-16x16.png">
+    
     <title>PSIS VH - Campaign Frame</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         html { scroll-behavior: smooth; }
         .frame-container {
@@ -23,7 +30,6 @@
             position: absolute;
             top: 0; left: 0;
             transform-origin: center center;
-            cursor: move;
             will-change: transform;
         }
         #frameOverlay {
@@ -33,44 +39,31 @@
             pointer-events: none;
             z-index: 10;
         }
-        /* New Success Overlay */
-        #downloadOverlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 200;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            color: white;
-        }
     </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-50 font-sans">
 
-    <div id="downloadOverlay">
-        <p class="mb-4 font-bold text-lg text-center">✅ Image Ready!</p>
-        <img id="finalResult" class="max-w-full max-h-[60vh] rounded-lg shadow-2xl border-4 border-white mb-6">
-        <p class="text-sm text-yellow-400 mb-6">👆 Long Press on the image and select "Save Image"</p>
-        <button onclick="closeOverlay()" class="bg-white text-black px-6 py-2 rounded-full font-bold">Back to Edit</button>
-    </div>
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <img src="https://psisvh.vercel.app/logo.png" alt="Logo" class="h-8" />
+            <a href="#campaign-frame-tool" class="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-bold">Create Photo</a>
+        </div>
+    </header>
 
-    <section id="campaign-frame-tool" class="py-10 px-4 max-w-lg mx-auto">
-        <div class="bg-white rounded-3xl shadow-xl p-6 border-4 border-yellow-400">
-            <h1 class="text-center font-black text-indigo-700 text-2xl mb-4 uppercase">Campaign Frame</h1>
+    <section id="campaign-frame-tool" class="py-12 px-4">
+        <div class="max-w-md mx-auto bg-white rounded-3xl shadow-xl p-6 border-4 border-yellow-400">
+            <h2 class="text-center text-xl font-black text-indigo-900 mb-6 uppercase">Support Our School</h2>
             
-            <div class="frame-container" id="canvasContainer">
+            <div class="frame-container border" id="canvasContainer">
                 <img id="uploadedImage" src="" />
                 <img id="frameOverlay" src="frame.png" />
             </div>
 
             <div class="mt-6 space-y-4">
-                <input type="file" accept="image/*" id="uploadInput" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 file:bg-indigo-600 file:text-white font-bold cursor-pointer"/>
+                <input type="file" accept="image/*" id="uploadInput" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 cursor-pointer"/>
                 
-                <button id="downloadBtn" class="w-full bg-green-500 text-white py-4 rounded-xl font-bold text-xl shadow-lg active:scale-95 transition-all">
-                    Generate Photo
+                <button id="downloadBtn" class="w-full bg-green-500 text-white py-4 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-all">
+                    Download & Save Photo
                 </button>
             </div>
         </div>
@@ -81,93 +74,108 @@
         const canvasContainer = document.getElementById('canvasContainer');
         const uploadInput = document.getElementById('uploadInput');
         const downloadBtn = document.getElementById('downloadBtn');
-        const downloadOverlay = document.getElementById('downloadOverlay');
-        const finalResult = document.getElementById('finalResult');
 
         let scale = 1, translateX = 0, translateY = 0, isDragging = false, startX = 0, startY = 0, initialDist = -1;
 
-        // Image Upload
-        uploadInput.onchange = (e) => {
+        // 1. Handle Upload
+        uploadInput.addEventListener('change', (e) => {
             const reader = new FileReader();
-            reader.onload = (ev) => { uploadedImage.src = ev.target.result; resetPos(); };
+            reader.onload = (event) => { uploadedImage.src = event.target.result; resetFrame(); };
             reader.readAsDataURL(e.target.files[0]);
-        };
+        });
 
-        function resetPos() { scale = 1; translateX = 0; translateY = 0; update(); }
-        function update() { uploadedImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`; }
+        function resetFrame() { scale = 1; translateX = 0; translateY = 0; updateTransform(); }
+        function updateTransform() { uploadedImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`; }
 
-        // Touch/Mouse Events
-        canvasContainer.onmousedown = (e) => { isDragging = true; startX = e.clientX - translateX; startY = e.clientY - translateY; };
-        window.onmousemove = (e) => { if(isDragging) { translateX = e.clientX - startX; translateY = e.clientY - startY; update(); } };
-        window.onmouseup = () => isDragging = false;
+        // 2. Drag & Zoom Logic
+        canvasContainer.addEventListener('mousedown', (e) => { isDragging = true; startX = e.clientX - translateX; startY = e.clientY - translateY; });
+        window.addEventListener('mousemove', (e) => { if (isDragging) { translateX = e.clientX - startX; translateY = e.clientY - startY; updateTransform(); } });
+        window.addEventListener('mouseup', () => isDragging = false);
 
-        canvasContainer.ontouchstart = (e) => {
+        canvasContainer.addEventListener('touchstart', (e) => {
             if (e.touches.length === 1) {
                 isDragging = true; startX = e.touches[0].clientX - translateX; startY = e.touches[0].clientY - translateY;
             } else if (e.touches.length === 2) {
                 initialDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
             }
-        };
-        canvasContainer.ontouchmove = (e) => {
+        }, { passive: false });
+
+        canvasContainer.addEventListener('touchmove', (e) => {
+            e.preventDefault();
             if (isDragging && e.touches.length === 1) {
                 translateX = e.touches[0].clientX - startX; translateY = e.touches[0].clientY - startY;
             } else if (e.touches.length === 2) {
                 let dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
                 scale *= (dist / initialDist); initialDist = dist;
             }
-            update();
-        };
+            updateTransform();
+        }, { passive: false });
 
-        // NEW CAPTURE LOGIC (Fixes Telegram Move)
-        downloadBtn.onclick = () => {
-            if (!uploadedImage.src) return alert("Please upload a photo!");
+        // 3. THE FIX: Process Image & Save
+        downloadBtn.addEventListener('click', async () => {
+            if (!uploadedImage.src) return alert("Please upload a photo first!");
             
-            downloadBtn.innerText = "Processing...";
+            // Lock UI
+            downloadBtn.innerText = "Generating...";
             downloadBtn.disabled = true;
 
-            // Freeze scroll for Telegram stability
+            // Fix Panning: Temporarily disable smooth scroll and lock position
             const originalScroll = document.documentElement.style.scrollBehavior;
             document.documentElement.style.scrollBehavior = 'auto';
 
             const rect = canvasContainer.getBoundingClientRect();
 
-            html2canvas(canvasContainer, {
-                useCORS: true,
-                scale: 3, // High quality
+            html2canvas(canvasContainer, { 
+                useCORS: true, 
+                scale: 3, // Higher quality
                 width: rect.width,
                 height: rect.height,
                 x: window.scrollX + rect.left,
                 y: window.scrollY + rect.top,
                 scrollX: 0,
-                scrollY: 0
-            }).then(canvas => {
+                scrollY: 0,
+                backgroundColor: null
+            }).then(async (canvas) => {
                 document.documentElement.style.scrollBehavior = originalScroll;
                 const base64Image = canvas.toDataURL("image/png");
 
-                // Send to PHP storage
-                fetch('https://xau.news/psisvh/upload.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ image: base64Image })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        // Instead of redirecting away, we show it in an overlay
-                        finalResult.src = data.url;
-                        downloadOverlay.style.display = 'flex';
-                    }
-                })
-                .finally(() => {
-                    downloadBtn.innerText = "Generate Photo";
-                    downloadBtn.disabled = false;
-                });
-            });
-        };
+                // Send to PHP Storage
+                try {
+                    const response = await fetch('https://xau.news/psisvh/upload.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ image: base64Image })
+                    });
+                    const data = await response.json();
 
-        function closeOverlay() {
-            downloadOverlay.style.display = 'none';
-        }
+                    if (data.status === 'success') {
+                        // NATIVE SHARE (Closest thing to auto-download on Mobile)
+                        if (navigator.share) {
+                            fetch(data.url)
+                            .then(res => res.blob())
+                            .then(blob => {
+                                const file = new File([blob], "psisvh_photo.png", { type: "image/png" });
+                                navigator.share({
+                                    files: [file],
+                                    title: 'My Campaign Photo',
+                                }).catch(() => {
+                                    // Fallback if share is cancelled
+                                    window.location.href = data.url;
+                                });
+                            });
+                        } else {
+                            // Fallback for older browsers
+                            window.location.href = data.url;
+                        }
+                    }
+                } catch (err) {
+                    alert("Upload error. Please try again.");
+                } finally {
+                    downloadBtn.innerText = "Download & Save Photo";
+                    downloadBtn.disabled = false;
+                }
+            });
+        });
     </script>
 </body>
 </html>
